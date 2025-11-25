@@ -1,0 +1,180 @@
+## Purpose
+
+This file documents **project-wide conventions** for Next.js, TypeScript, and the **components / models / services** pattern.  
+All new features should follow these rules unless there is a very strong reason not to.
+
+---
+
+## Folder structure & feature pattern
+
+- **Top-level layout**
+
+  - `src/app`: Next.js routes, layouts, and pages (App Router).
+  - `src/features/<featureName>`: Feature modules (e.g. `exampleProduct`).
+  - `src/shared/lib`: Cross-cutting infrastructure (Firebase, utils, config, etc.).
+  - `src/shared/ui`: Shared, reusable UI components (buttons, inputs, layout components, etc.) and shadcn components.
+
+- **Feature module pattern**
+
+  - Every feature in `src/features/<featureName>` **must** follow:
+    - `components/` – React components specific to this feature.
+    - `models/` – TypeScript **types and interfaces** (domain models and service contracts).
+    - `services/` – Side-effectful logic (API calls, Firestore, etc.), implemented as plain async functions.
+
+- **Example (from `exampleProduct`)**
+  - `components/AddProductForm.tsx` – client component, uses services to mutate data.
+  - `components/ProductList.tsx` – async **server component**, uses services to fetch data.
+  - `models/product.types.ts` – domain types (`Product`) and service contracts (`NewProductData`).
+  - `services/addProduct.ts` / `services/getProducts.ts` – one operation per file, using `models` and shared libs.
+
+---
+
+## Components: server vs client
+
+- **Default to server components**
+
+  - Components in `src/app` and feature `components/` should be **server components by default** (no `"use client"`).
+  - Use **async server components** to do SSR data fetching, like `ProductList`.
+
+- **When to use client components (`"use client"`)**
+
+  - Only when you need:
+    - Browser APIs (`window`, `document`, `localStorage`, etc.).
+    - React hooks that are **client-only** (`useState`, `useEffect`, `useRef`, `useContext` for client state).
+    - Direct DOM manipulation or event handlers (forms, buttons, drag & drop, etc.).
+  - Put `"use client"` **at the top of the file** and keep these components as small and focused as possible.
+  - Pattern:
+    - **Server component** fetches data via services.
+    - Server component **passes data via props** into a client component (for interactivity).
+
+- **Data flow rule**
+  - **NEVER** fetch data directly from the browser if you can fetch it on the server and pass it down.
+  - Prefer:
+    - Server component (SSR) → calls `services/*` → passes data to children.
+    - Client components only call services for actions that truly require browser context (e.g. optimistic updates, form submissions that depend on client-only state).
+
+---
+
+## Services: side effects & SSR-friendly logic
+
+- **Location and naming**
+
+  - Place them in `src/features/<featureName>/services/`.
+  - Use **one file per operation** (e.g. `getProducts.ts`, `addProduct.ts`, `updateProduct.ts`, `deleteProduct.ts`).
+
+- **Contracts**
+
+  - Input and output shapes must be defined in `models/` and imported into services.
+  - Example:
+    - `NewProductData` in `models/product.types.ts` is the contract for `addProduct`.
+  - **No raw `any`** for service output; always type results with proper models.
+
+- **Purity and environment**
+
+  - Services are **environment-aware** but **UI-agnostic**:
+    - They can call Firestore, HTTP APIs, or other infra from `shared/lib`.
+    - They must **not** import React or deal with JSX/HTML.
+  - Services must be safe to call from:
+    - Server components (preferred).
+    - API routes or server actions (if added later).
+    - Occasionally client components (e.g. form submissions) – but design them so they do not depend on browser-only globals.
+
+- **Error handling**
+  - Services should return **structured results**, not just throw:
+    - `{ success: true, data: ... }` or `{ success: false, error: string }`.
+  - Log unexpected errors inside the service (`console.error(...)`) and return a safe error message.
+
+---
+
+## Models: domain types & contracts
+
+- **Location**
+
+  - Put domain and contract types in `src/features/<featureName>/models/`.
+  - Use clear file names like:
+    - `product.types.ts`
+    - `user.types.ts`
+    - `order.types.ts`
+
+- **Responsibilities**
+
+  - **Domain models** (e.g. `Product`) represent core entities.
+  - **Service contracts** (e.g. `NewProductData`) define input/output of services.
+  - Keep them **pure TypeScript** (no imports from React or services).
+
+- **Usage rules**
+  - Components and services must import from `models` instead of redefining types locally.
+  - Avoid duplicating shapes (e.g. don’t recreate `{ name: string; price: number }` inline).
+
+---
+
+## Next.js data fetching & rendering rules
+
+- **Assume App Router**
+
+  - Use the App Router patterns (async server components, layouts).
+  - For data fetching, prefer **async server components** over client-side fetching when possible.
+
+- **Use SSR by default when:**
+
+  - Content is **SEO-relevant** or should be indexed by search engines.
+  - Data needs to be **fresh on each request** (e.g. dashboards, lists like `ProductList`).
+  - The page should render even with JS disabled or slow.
+
+- **Use SSG/ISR (static generation) when:**
+
+  - Data changes rarely and doesn’t need to be real-time (e.g. marketing pages).
+  - Use `revalidate` on the route to control how often static content is regenerated.
+
+- **Use client-side fetching when:**
+
+  - Data is **highly user-specific** and not cacheable at the edge (e.g. user-only dashboards, private data).
+  - You need **real-time** updates or heavy client-side interactivity (search-as-you-type, infinite scroll).
+  - Even then, try to:
+    - Render an initial SSR shell.
+    - Hydrate and enhance on the client.
+
+- **Avoid mixing concerns**
+  - Keep **fetching** in:
+    - Server components and/or
+    - Dedicated services used by those components.
+  - Keep **presentation and interactivity** in:
+    - Components inside `components/` (server or client, depending on needs).
+
+---
+
+## Shared layer rules
+
+- **`src/shared/lib`**
+
+  - Use for:
+    - Firebase initialization (`firebase.ts`).
+    - Common utilities (`utils.ts`).
+    - Config, constants, and non-React helpers.
+  - Must not depend on feature-specific code.
+
+- **`src/shared/ui`**
+  - Use for:
+    - Generic, reusable UI components (buttons, inputs, modals, layout primitives, etc.).
+  - Components here should be **feature-agnostic** and customizable via props.
+
+---
+
+## General best practices
+
+- **TypeScript**
+
+  - Avoid `any`; prefer explicit types and interfaces from `models`.
+  - Type service responses and error objects.
+
+- **Imports & boundaries**
+
+  - **No circular dependencies** between `components`, `models`, and `services`.
+  - `components` can import from `models`, `services`, and `shared/*`.
+  - `services` can import from `models` and `shared/lib`, but **not** from `components` or `shared/ui`.
+  - `models` should only depend on other `models` (if needed).
+
+- **Clean code**
+  - Keep files small and focused (single responsibility).
+  - Prefer composition over large, multi-purpose components or services.
+  - Comment only when intent is not obvious from the code; otherwise, keep code self-explanatory.
