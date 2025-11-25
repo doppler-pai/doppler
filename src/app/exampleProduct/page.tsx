@@ -1,5 +1,5 @@
-import { AddProductForm } from "@/features/exampleProduct/components/AddProductForm";
-import { ProductList } from "@/features/exampleProduct/components/ProductList";
+import { AddProductForm } from '@/features/exampleProduct/components/AddProductForm';
+import { ProductList } from '@/features/exampleProduct/components/ProductList';
 
 export default async function ProductsPage() {
   return (

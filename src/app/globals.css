@@ -1,5 +1,7 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-bg-very-dark: var(--color-base-900);
@@ -50,7 +52,7 @@
 
 :root {
   --radius: 0.625rem;
-  --background: var(--color-base-950);
+  --background: var(--color-base-900);
   --foreground: var(--color-base-50);
   --card: var(--color-base-900);
   --card-foreground: var(--color-base-50);
@@ -73,8 +75,8 @@
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.208 0.042 265.755);
-  --sidebar-foreground: var(--color-base-950);
+  --sidebar: var(--color-base-950);
+  --sidebar-foreground: var(--color-base-50);
   --sidebar-primary: var(--color-base-100);
   --sidebar-primary-foreground: var(--color-base-950);
   --sidebar-accent: var(--color-base-900);
@@ -92,6 +94,7 @@
   --color-base-300: #cdcbe1;
   --color-base-200: #e3e2f0;
   --color-base-100: #f2f1f9;
+  --color-base-50: #f8f8fc;
 
   --color-purple-800: #3c096c;
   --color-purple-700: #5a189a;

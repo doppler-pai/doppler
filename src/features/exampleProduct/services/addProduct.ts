@@ -1,12 +1,12 @@
 // kazdy (GET POST UPDATE DELETE) w oddzielnym pliku
 
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { NewProductData } from "../models/product.types";
-import { db } from "@/shared/lib/firebase";
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { NewProductData } from '../models/product.types';
+import { db } from '@/shared/lib/firebase';
 
 export async function addProduct(data: NewProductData) {
   try {
-    const productsRef = collection(db, "products");
+    const productsRef = collection(db, 'products');
     //tak sie bierze referencje do danego punktu w bazie danych, ten string to poprostu sciezka np users/skin/mati
 
     //add doc wiadomo o co chodzi
@@ -19,11 +19,11 @@ export async function addProduct(data: NewProductData) {
       success: true,
       id: docRef.id,
     };
-  } catch (error: any) {
-    console.error("Error adding product:", error);
+  } catch (error: unknown) {
+    console.error('Error adding product:', error);
     return {
       success: false,
-      error: error.message,
+      error: error instanceof Error ? error.message : String(error),
     };
   }
 }

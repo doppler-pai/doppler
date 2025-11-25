@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { addProduct } from "../services/addProduct";
+import { useState } from 'react';
+import { addProduct } from '../services/addProduct';
 
 export const AddProductForm = () => {
-  const [name, setName] = useState("");
-  const [price, setPrice] = useState("");
+  const [name, setName] = useState('');
+  const [price, setPrice] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -14,12 +14,12 @@ export const AddProductForm = () => {
     // Dodajemy dane client componentem
 
     if (result.success) {
-      setName("");
-      setPrice("");
+      setName('');
+      setPrice('');
       alert(`Product added with ID: ${result.id}`);
       window.location.reload(); // simple refresh to show new product
     } else {
-      alert("Failed to add product: " + result.error);
+      alert('Failed to add product: ' + result.error);
     }
   };
 
