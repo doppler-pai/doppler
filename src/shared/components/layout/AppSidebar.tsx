@@ -35,7 +35,7 @@ const links = [
   },
   {
     title: 'Sets',
-    url: '#',
+    url: '/sets',
     icon: List,
   },
   {

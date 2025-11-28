@@ -1,5 +1,6 @@
 export interface SetCardProps {
-  name: String;
-  plays: Number;
-  edited: Number;
+  title: string;
+  plays: number;
+  edited: number;
+  questions: number;
 }

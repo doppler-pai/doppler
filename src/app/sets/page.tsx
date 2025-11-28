@@ -1,12 +1,17 @@
-import { SetCard } from '@/features/sets/components/SetCard';
-import { ProtectedRoute } from '@/shared/components/auth/ProtectedRoute';
+'use client'
 
-export default async function setsPage() {
+import { SetCardList } from '@/features/sets/components/SetCardList';
+import { ProtectedRoute } from '@/shared/components/auth/ProtectedRoute';
+import { useAuth } from '@/shared/hooks/useAuth'
+
+export default function setsPage() {
+  const { user } = useAuth()
+
   return (
     <ProtectedRoute>
       {' '}
       <main>
-        <SetCard name="cwaniak" plays={6969} edited={420}></SetCard>
+        <SetCardList userId={user?.uid || ''}/>
       </main>
     </ProtectedRoute>
   );
