@@ -13,7 +13,7 @@ export const PackCard: React.FC<SkinCardProps> = ({ variant }) => {
   const VARIANTS = {
     common: {
       gradient: 'radial-gradient(circle, #F1F1F9 0%, #00AAFF 100%)',
-      imageSrc: '',
+      imageSrc: '/packs/clashRoyale/common.png',
       price: 100,
     },
     epic: {
@@ -37,9 +37,10 @@ export const PackCard: React.FC<SkinCardProps> = ({ variant }) => {
   return (
     <div
       style={{ background: configuration.gradient }}
-      className="p-4 rounded-lg text-white flex flex-col items-center h-62 w-52"
+      className="p-4 rounded-lg text-white flex flex-col items-center h-68 w-54"
     >
-      <h3 className="text-lg font-bold">{name}</h3>
+        <img src={configuration.imageSrc} alt='image'
+        className='w-[120px] h-[130px] object-cover rotate-10 mt-4' />
     </div>
   );
 };
