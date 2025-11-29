@@ -1,9 +1,7 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 import { Button } from '@/shared/components/ui/button';
-import { config } from 'process';
 
 interface SkinCardProps {
   variant: 'common' | 'epic' | 'legendary';
@@ -40,11 +38,11 @@ export const PackCard: React.FC<SkinCardProps> = ({ variant }) => {
       className="p-4 rounded-lg text-white flex flex-col items-center h-68 w-54"
     >
       <img src={configuration.imageSrc} alt="image" className="w-[120px] h-[130px] object-cover rotate-10 mt-4" />
-      <div className='flex items-center mt-6 mb-2 gap-3'>
+      <div className="flex items-center mt-6 mb-2 gap-3">
         <h4 className="text-white text-lg">{configuration.price}</h4>
         <img src="/logo/logo.png" alt="coin" className="w-6 h-6" />
       </div>
-      <Button className='w-32 h-8'>Buy</Button>
+      <Button className="w-32 h-8">Buy</Button>
     </div>
   );
 };

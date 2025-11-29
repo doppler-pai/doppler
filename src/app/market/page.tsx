@@ -7,8 +7,6 @@ import { PackCard } from '@/features/market/PackCard';
 import Link from 'next/link';
 
 export default function Market() {
-  const router = useRouter();
-
   return (
     <div className="w-full">
       <div className="w-full h-16 flex items-center px-12 justify-between">
@@ -16,7 +14,7 @@ export default function Market() {
         <div className="flex items-center gap-8 mt-10 mr-12">
           <Button variant={'outline'}>
             value
-            <img src="/logo/logo.png" className='w-4 h-4' />
+            <img src="/logo/logo.png" className="w-4 h-4" />
           </Button>
           <Button variant={'outline'}>Skins owned: </Button>
           <Link href="/mydopples">
@@ -30,10 +28,10 @@ export default function Market() {
           <Separator className="bg-white" />
         </div>
       </div>
-      <div className='ml-38 flex gap-36'>
-        <PackCard variant='common'></PackCard>
-        <PackCard variant='epic'></PackCard>
-        <PackCard variant='legendary'></PackCard>
+      <div className="ml-38 flex gap-36">
+        <PackCard variant="common"></PackCard>
+        <PackCard variant="epic"></PackCard>
+        <PackCard variant="legendary"></PackCard>
       </div>
     </div>
   );
