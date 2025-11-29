@@ -41,8 +41,8 @@ export const PackCard: React.FC<SkinCardProps> = ({ variant }) => {
     >
       <img src={configuration.imageSrc} alt="image" className="w-[120px] h-[130px] object-cover rotate-10 mt-4" />
       <div className='flex items-center mt-6 mb-2 gap-3'>
-        <h5 className="text-white text-lg">{configuration.price}</h5>
-        <img src="/logo/logo.png" alt="coin" className="w-4 h-4" />
+        <h4 className="text-white text-lg">{configuration.price}</h4>
+        <img src="/logo/logo.png" alt="coin" className="w-6 h-6" />
       </div>
       <Button className='w-32 h-8'>Buy</Button>
     </div>

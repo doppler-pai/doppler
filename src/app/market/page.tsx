@@ -26,7 +26,7 @@ export default function Market() {
       </div>
       <div className="w-full h-24 mt-20">
         <div className="ml-24 w-[850px]">
-          <h2 className="ml-2">Clash Royale</h2>
+          <h2 className="ml-2 mb-2">Clash Royale</h2>
           <Separator className="bg-white" />
         </div>
       </div>
