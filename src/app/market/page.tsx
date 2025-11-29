@@ -57,7 +57,7 @@ export default function Market() {
         </div>
       </div>
 
-      <div className="w-full h-24 mt-24">
+      <div className="w-full h-24 mt-20">
         <div className="ml-24 w-[900px]">
           <h2 className="ml-2 mb-2">Clash Royale</h2>
           <Separator className="bg-white" />
@@ -68,6 +68,19 @@ export default function Market() {
         <PackCard variant="common" />
         <PackCard variant="epic" />
         <PackCard variant="legendary" />
+      </div>
+
+      <div className="w-full h-24 mt-16">
+        <div className="ml-24 w-[900px]">
+          <h2 className="ml-2 mb-2">Brainrot</h2>
+          <Separator className="bg-white" />
+        </div>
+      </div>
+
+      <div className="ml-38 flex gap-36">
+        <PackCard variant='common' />
+        <PackCard variant='epic' />
+        <PackCard variant='legendary' />
       </div>
     </div>
   );
