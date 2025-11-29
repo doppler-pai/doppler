@@ -5,7 +5,6 @@ import { auth, db } from '@/shared/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 
-
 import { Button } from '@/shared/components/ui/button';
 import { Separator } from '@/shared/components/ui/separator';
 import { PackCard } from '@/features/market/PackCard';
@@ -13,26 +12,29 @@ import Link from 'next/link';
 
 export default function Market() {
   const [coins, setCoins] = useState<number | null>(null);
+  const [skinsCount, setSkinsCount] = useState<number | null>(null);
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (!user) {
         setCoins(null);
+        setSkinsCount(null);
         return;
       }
-  
+
       const ref = doc(db, 'users', user.uid);
       const snap = await getDoc(ref);
 
-      console.log("DOC DATA:", snap.data());
-  
       if (snap.exists()) {
-        setCoins(snap.data().currency ?? 0);
+        const data = snap.data();
+        setCoins(data.currency ?? 0);
+        const ownedSkinIds = data.ownedSkinIds ?? [];
+        setSkinsCount(ownedSkinIds.length);
       }
     });
-  
+
     return () => unsubscribe();
   }, []);
-  
 
   return (
     <div className="w-full">
@@ -43,22 +45,26 @@ export default function Market() {
             {coins !== null ? coins : '...'}
             <img src="/logo/logo.png" className="w-4 h-4" />
           </Button>
-          <Button variant={'outline'}>Skins owned: </Button>
+          <Button variant={'outline'}>
+            Skins owned: {skinsCount !== null ? skinsCount : '...'}
+          </Button>
           <Link href="/mydopples">
             <Button>My skin</Button>
           </Link>
         </div>
       </div>
+
       <div className="w-full h-24 mt-24">
         <div className="ml-24 w-[900px]">
           <h2 className="ml-2 mb-2">Clash Royale</h2>
           <Separator className="bg-white" />
         </div>
       </div>
+
       <div className="ml-38 flex gap-36">
-        <PackCard variant="common"></PackCard>
-        <PackCard variant="epic"></PackCard>
-        <PackCard variant="legendary"></PackCard>
+        <PackCard variant="common" />
+        <PackCard variant="epic" />
+        <PackCard variant="legendary" />
       </div>
     </div>
   );
