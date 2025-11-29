@@ -12,17 +12,17 @@ interface SkinCardProps {
 export const PackCard: React.FC<SkinCardProps> = ({ variant }) => {
   const VARIANTS = {
     common: {
-      gradient: 'radial-gradient(circle, #F1F1F9 0%, #00AAFF 100%)',
+      gradient: 'radial-gradient(circle at center 35%, #F1F1F9 0%, #00AAFF 100%)',
       imageSrc: '/packs/clashRoyale/common.png',
       price: 100,
     },
     epic: {
-      gradient: 'radial-gradient(circle, #F1F1F9 0%, #7B2CBF 100%',
-      imageSrc: '',
+      gradient: 'radial-gradient(circle at center 35%, #F1F1F9 0%, #7B2CBF 100%',
+      imageSrc: '/packs/clashRoyale/epic.png',
       price: 250,
     },
     legendary: {
-      gradient: 'radial-gradient(circle, #F1F1F9 0%, #FF9E00 100%',
+      gradient: 'radial-gradient(circle at center 35%, #F1F1F9 0%, #FF9E00 100%',
       imageSrc: '',
       price: 500,
     },
@@ -39,8 +39,12 @@ export const PackCard: React.FC<SkinCardProps> = ({ variant }) => {
       style={{ background: configuration.gradient }}
       className="p-4 rounded-lg text-white flex flex-col items-center h-68 w-54"
     >
-        <img src={configuration.imageSrc} alt='image'
-        className='w-[120px] h-[130px] object-cover rotate-10 mt-4' />
+      <img src={configuration.imageSrc} alt="image" className="w-[120px] h-[130px] object-cover rotate-10 mt-4" />
+      <div className='flex items-center mt-6 mb-2 gap-3'>
+        <h5 className="text-white text-lg">{configuration.price}</h5>
+        <img src="/logo/logo.png" alt="coin" className="w-4 h-4" />
+      </div>
+      <Button className='w-32 h-8'>Buy</Button>
     </div>
   );
 };

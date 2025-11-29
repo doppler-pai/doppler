@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { Button } from '@/shared/components/ui/button';
 import { Separator } from '@/shared/components/ui/separator';
-import { PackCard } from '@/features/auth/components/PackCard';
+import { PackCard } from '@/features/market/PackCard';
 import Link from 'next/link';
 
 export default function Market() {
@@ -16,7 +16,7 @@ export default function Market() {
         <div className="flex items-center gap-8 mt-10 mr-12">
           <Button variant={'outline'}>
             value
-            <img src="../../../public/logo/logo.png" />
+            <img src="/logo/logo.png" className='w-4 h-4' />
           </Button>
           <Button variant={'outline'}>Skins owned: </Button>
           <Link href="/mydopples">
