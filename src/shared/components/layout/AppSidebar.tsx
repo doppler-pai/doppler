@@ -30,7 +30,7 @@ const links = [
   },
   {
     title: 'Dopple Market',
-    url: '#',
+    url: 'market',
     icon: Store,
   },
   {
