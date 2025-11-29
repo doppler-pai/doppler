@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { auth, db } from '@/shared/lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, onSnapshot } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 
 import { Button } from '@/shared/components/ui/button';
@@ -15,7 +15,8 @@ export default function Market() {
   const [skinsCount, setSkinsCount] = useState<number | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    let unsubscribeSnapshot: (() => void) | null = null;
+    const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
       if (!user) {
         setCoins(null);
         setSkinsCount(null);
@@ -23,17 +24,19 @@ export default function Market() {
       }
 
       const ref = doc(db, 'users', user.uid);
-      const snap = await getDoc(ref);
 
-      if (snap.exists()) {
-        const data = snap.data();
-        setCoins(data.currency ?? 0);
-        const ownedSkinIds = data.ownedSkinIds ?? [];
-        setSkinsCount(ownedSkinIds.length);
-      }
+      unsubscribeSnapshot = onSnapshot(ref, (snap) => {
+        if (snap.exists()) {
+          const data = snap.data();
+          setCoins(data.currency ?? 0);
+          setSkinsCount((data.ownedSkinIds ?? []).length);
+        }
+      })
     });
-
-    return () => unsubscribe();
+    return () => {
+      unsubscribeAuth();
+      if (unsubscribeSnapshot) unsubscribeSnapshot();
+    }
   }, []);
 
   return (
