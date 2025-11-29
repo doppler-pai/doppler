@@ -23,7 +23,7 @@ export const PackCard: React.FC<SkinCardProps> = ({ variant }) => {
     },
     legendary: {
       gradient: 'radial-gradient(circle at center 35%, #F1F1F9 0%, #FF9E00 100%',
-      imageSrc: '',
+      imageSrc: '/packs/clashRoyale/legendary.png',
       price: 500,
     },
   };
