@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { auth, db } from '@/shared/lib/firebase';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 
 import { Button } from '@/shared/components/ui/button';
@@ -39,6 +39,23 @@ export default function Market() {
     };
   }, []);
 
+  const handleBuy = async (price: number) => {
+    const user = auth.currentUser;
+    if (!user || coins === null) return;
+
+    if (coins < price) {
+      alert("Not enough coins!");
+      return;
+    }
+
+    const newCoins = coins - price;
+
+    const ref = doc(db, "users", user.uid);
+    await updateDoc(ref, { currency: newCoins});
+
+    setCoins(newCoins);
+  }
+
   return (
     <div className="w-full">
       <div className="w-full h-16 flex items-center px-12 justify-between">
@@ -63,9 +80,9 @@ export default function Market() {
       </div>
 
       <div className="ml-38 flex gap-36">
-        <PackCard variant="common" />
-        <PackCard variant="epic" />
-        <PackCard variant="legendary" />
+        <PackCard variant="common" onBuy={handleBuy} />
+        <PackCard variant="epic" onBuy={handleBuy} />
+        <PackCard variant="legendary" onBuy={handleBuy} />
       </div>
 
       <div className="w-full h-24 mt-16">
@@ -76,9 +93,9 @@ export default function Market() {
       </div>
 
       <div className="ml-38 flex gap-36">
-        <PackCard variant="common" />
-        <PackCard variant="epic" />
-        <PackCard variant="legendary" />
+        <PackCard variant="common" onBuy={handleBuy} />
+        <PackCard variant="epic" onBuy={handleBuy} />
+        <PackCard variant="legendary" onBuy={handleBuy} />
       </div>
     </div>
   );
