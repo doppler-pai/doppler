@@ -5,9 +5,10 @@ import { Button } from '@/shared/components/ui/button';
 
 interface SkinCardProps {
   variant: 'common' | 'epic' | 'legendary';
+  onBuy?: (price: number) => void;
 }
 
-export const PackCard: React.FC<SkinCardProps> = ({ variant }) => {
+export const PackCard: React.FC<SkinCardProps> = ({ variant, onBuy }) => {
   const VARIANTS = {
     common: {
       gradient: 'radial-gradient(circle at center 35%, #F1F1F9 0%, #00AAFF 100%)',
@@ -42,7 +43,9 @@ export const PackCard: React.FC<SkinCardProps> = ({ variant }) => {
         <h4 className="text-white text-lg">{configuration.price}</h4>
         <img src="/logo/logo.png" alt="coin" className="w-6 h-6" />
       </div>
-      <Button className="w-32 h-8">Buy</Button>
+      <Button className="w-32 h-8" onClick={() => onBuy?.(configuration.price)}>
+        Buy
+      </Button>
     </div>
   );
 };

@@ -31,12 +31,12 @@ export default function Market() {
           setCoins(data.currency ?? 0);
           setSkinsCount((data.ownedSkinIds ?? []).length);
         }
-      })
+      });
     });
     return () => {
       unsubscribeAuth();
       if (unsubscribeSnapshot) unsubscribeSnapshot();
-    }
+    };
   }, []);
 
   return (
@@ -48,9 +48,7 @@ export default function Market() {
             {coins !== null ? coins : '...'}
             <img src="/logo/logo.png" className="w-4 h-4" />
           </Button>
-          <Button variant={'outline'}>
-            Skins owned: {skinsCount !== null ? skinsCount : '...'}
-          </Button>
+          <Button variant={'outline'}>Skins owned: {skinsCount !== null ? skinsCount : '...'}</Button>
           <Link href="/mydopples">
             <Button>My skin</Button>
           </Link>
@@ -78,9 +76,9 @@ export default function Market() {
       </div>
 
       <div className="ml-38 flex gap-36">
-        <PackCard variant='common' />
-        <PackCard variant='epic' />
-        <PackCard variant='legendary' />
+        <PackCard variant="common" />
+        <PackCard variant="epic" />
+        <PackCard variant="legendary" />
       </div>
     </div>
   );
