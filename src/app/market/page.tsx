@@ -8,6 +8,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { Button } from '@/shared/components/ui/button';
 import { Separator } from '@/shared/components/ui/separator';
 import { PackCard } from '@/features/market/PackCard';
+import OpenPack from '@/features/roller/components/OpenPack';
 import Link from 'next/link';
 
 export default function Market() {
@@ -80,7 +81,7 @@ export default function Market() {
       </div>
 
       <div className="ml-38 flex gap-36">
-        <PackCard variant="common" onBuy={handleBuy} />
+        <OpenPack packType="common" />
         <PackCard variant="epic" onBuy={handleBuy} />
         <PackCard variant="legendary" onBuy={handleBuy} />
       </div>
