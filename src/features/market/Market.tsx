@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { auth, db } from '@/shared/lib/firebase';
 import { doc, onSnapshot, updateDoc, arrayUnion } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
+import { PackType } from '@/shared/models/PackType';
+import { handleBuyService } from './services/handleBuy';
 
 import { Button } from '@/shared/components/ui/button';
 import { Separator } from '@/shared/components/ui/separator';
@@ -14,7 +16,7 @@ import Link from 'next/link';
 export default function Market() {
   const [coins, setCoins] = useState<number | null>(null);
   const [skinsCount, setSkinsCount] = useState<number | null>(null);
-  const [rollingPack, setRollingPack] = useState<'common' | 'epic' | 'legendary' | null>(null);
+  const [rollingPack, setRollingPack] = useState<PackType | null>(null);
 
   useEffect(() => {
     let unsubscribeSnapshot: (() => void) | null = null;
@@ -43,7 +45,7 @@ export default function Market() {
     };
   }, []);
 
-  const handleBuy = async (packType: 'common' | 'epic' | 'legendary', price: number) => {
+  const handleBuy = async (packType: PackType, price: number) => {
     const user = auth.currentUser;
     if (!user || coins === null) return;
 
@@ -52,11 +54,13 @@ export default function Market() {
       return;
     }
 
-    const newCoins = coins - price;
-    const ref = doc(db, 'users', user.uid);
-    await updateDoc(ref, { currency: newCoins });
-    setCoins(newCoins);
+    const updatedCoins = await handleBuyService({
+      userId: user.uid,
+      coins,
+      price,
+    });
 
+    setCoins(updatedCoins);
     setRollingPack(packType);
   };
 
@@ -81,9 +85,7 @@ export default function Market() {
             {coins !== null ? coins : '...'}
             <img src="/logo/logo.png" className="w-4 h-4" />
           </Button>
-          <Button variant="outline">
-            Skins owned: {skinsCount !== null ? skinsCount : '...'}
-          </Button>
+          <Button variant="outline">Skins owned: {skinsCount !== null ? skinsCount : '...'}</Button>
           <Link href="/mydopples">
             <Button>My skin</Button>
           </Link>
@@ -98,17 +100,12 @@ export default function Market() {
       </div>
 
       <div className="ml-38 flex gap-36">
-        <PackCard variant="common" onBuy={(price) => handleBuy('common', price)} />
-        <PackCard variant="epic" onBuy={(price) => handleBuy('epic', price)} />
-        <PackCard variant="legendary" onBuy={(price) => handleBuy('legendary', price)} />
+        <PackCard variant={PackType.COMMON} onBuy={(price) => handleBuy(PackType.COMMON, price)} />
+        <PackCard variant={PackType.EPIC} onBuy={(price) => handleBuy(PackType.EPIC, price)} />
+        <PackCard variant={PackType.LEGENDARY} onBuy={(price) => handleBuy(PackType.LEGENDARY, price)} />
       </div>
 
-      {rollingPack && (
-        <OpenPack
-          packType={rollingPack}
-          onFinish={handleRollFinish}
-        />
-      )}
+      {rollingPack && <OpenPack packType={rollingPack} onFinish={handleRollFinish} />}
 
       <div className="w-full h-24 mt-16">
         <div className="ml-24 w-[900px]">
@@ -118,9 +115,9 @@ export default function Market() {
       </div>
 
       <div className="ml-38 flex gap-36">
-        <PackCard variant="common" onBuy={(price) => handleBuy('common', price)} />
-        <PackCard variant="epic" onBuy={(price) => handleBuy('epic', price)} />
-        <PackCard variant="legendary" onBuy={(price) => handleBuy('legendary', price)} />
+        <PackCard variant={PackType.COMMON} onBuy={(price) => handleBuy(PackType.COMMON, price)} />
+        <PackCard variant={PackType.EPIC} onBuy={(price) => handleBuy(PackType.EPIC, price)} />
+        <PackCard variant={PackType.LEGENDARY} onBuy={(price) => handleBuy(PackType.LEGENDARY, price)} />
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { PackType } from '@/shared/models/PackType';
 
 export interface Skin {
   id: string;
@@ -15,14 +16,14 @@ export interface SkinsData {
 }
 
 interface RollerProps {
-  packType: 'common' | 'epic' | 'legendary';
+  packType: PackType;
   onFinish: (skin: Skin) => void;
 }
 
-const PACK_RATES = {
-  common: { common: 80, epic: 18.5, legendary: 1.5 },
-  epic: { common: 5, epic: 85, legendary: 10 },
-  legendary: { common: 5, epic: 10, legendary: 85 },
+const PACK_RATES: Record<PackType, {common: number, epic: number, legendary: number }> = {
+  [PackType.COMMON]: { common: 80, epic: 18.5, legendary: 1.5 },
+  [PackType.EPIC]: { common: 5, epic: 85, legendary: 10 },
+  [PackType.LEGENDARY]: { common: 5, epic: 10, legendary: 85 },
 };
 
 export default function Roller({ packType, onFinish }: RollerProps) {

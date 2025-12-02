@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import Roller, { Skin } from "@/features/roller/components/Roller";
+import { PackType } from "@/shared/models/PackType";
 
 interface Props {
-  packType: "common" | "epic" | "legendary";
+  packType: PackType;
 }
 
 export default function OpenPack({ packType }: Props) {

@@ -2,9 +2,10 @@
 
 import React from 'react';
 import { Button } from '@/shared/components/ui/button';
+import { PackType } from '@/shared/models/PackType';
 
 interface SkinCardProps {
-  variant: 'common' | 'epic' | 'legendary';
+  variant: PackType;
   onBuy?: (price: number) => void;
 }
 
