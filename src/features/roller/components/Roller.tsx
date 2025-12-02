@@ -72,7 +72,7 @@ export default function Roller({ packType, onFinish }: RollerProps) {
     if (!container) return;
 
     const itemWidth = 120;
-    const repeat = 50;
+    const repeat = 30;
 
     const all = Object.values(skins).flat();
     const targetIndex = repeat * all.length + all.findIndex((s) => s.id === target.id);
@@ -90,18 +90,36 @@ export default function Roller({ packType, onFinish }: RollerProps) {
   const allSkins = Object.values(skins).flat();
 
   return (
-    <div className="relative w-full h-40 bg-black/60 overflow-hidden border rounded-md">
-      <div ref={containerRef} className="flex gap-4" style={{ transform: 'translateX(0px)' }}>
-        {Array(100)
-          .fill(0)
-          .flatMap((_, i) =>
-            allSkins.map((skin) => (
-              <img key={skin.id + '-' + i + '-' + Math.random()} src={skin.image} className="w-24 h-24 object-contain" />
-            )),
-          )}
-      </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+      <div className="bg-[#111] rounded-xl p-8 shadow-2xl border border-white/10 w-[80%] max-w-4xl">
 
-      <div className="absolute left-1/2 top-0 w-[3px] h-full bg-red-500"></div>
+        <h1 className="text-center text-white text-2xl mb-6">
+          Rolling {packType.toUpperCase()} Pack...
+        </h1>
+
+        <div className="relative w-full h-40 bg-black/60 overflow-hidden border rounded-lg mx-auto">
+
+          <div
+            ref={containerRef}
+            className="flex gap-4 py-6"
+            style={{ transform: 'translateX(0px)' }}
+          >
+            {Array(80)
+              .fill(0)
+              .flatMap((_, i) =>
+                allSkins.map((skin) => (
+                  <img
+                    key={skin.id + '-' + i}
+                    src={skin.image}
+                    className="w-28 h-28 object-contain rounded-md"
+                  />
+                ))
+              )}
+          </div>
+
+          <div className="absolute left-1/2 top-0 w-[4px] h-full bg-red-500 shadow-[0_0_12px_red]"></div>
+        </div>
+      </div>
     </div>
   );
 }
