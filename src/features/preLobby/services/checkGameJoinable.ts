@@ -1,8 +1,9 @@
 import { child, get, ref } from 'firebase/database';
 
 import { auth, rtdb } from '@/shared/lib/firebase';
+import { LobbyData, LobbyStatus } from '@/shared/models/lobby.types';
 
-export async function checkGameExists(gameId: string): Promise<boolean> {
+export async function checkGameJoinable(gameId: string): Promise<boolean> {
   try {
     const rootRef = ref(rtdb);
     const snapshot = await get(child(rootRef, `lobbies/${gameId}`));
@@ -11,7 +12,7 @@ export async function checkGameExists(gameId: string): Promise<boolean> {
       return false;
     }
 
-    const data = snapshot.val() as { hostId?: string } | null;
+    const data = snapshot.val() as LobbyData | null;
     const hostId = data?.hostId;
     const currentUserId = auth.currentUser?.uid;
 
@@ -21,6 +22,10 @@ export async function checkGameExists(gameId: string): Promise<boolean> {
 
     // Only allow joining if the current user is not the lobby host
     if (currentUserId === hostId) {
+      return false;
+    }
+
+    if (data?.status !== LobbyStatus.QUEUED) {
       return false;
     }
 

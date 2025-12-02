@@ -16,6 +16,7 @@ import {
 } from '@/shared/components/ui/sidebar';
 import { Button } from '@/shared/components/ui/button';
 import { useAuth } from '@/shared/hooks/useAuth';
+import { useRouter } from 'next/navigation';
 
 const links = [
   {
@@ -48,6 +49,7 @@ const links = [
 export function AppSidebar() {
   const { open } = useSidebar();
   const { user, logout } = useAuth();
+  const router = useRouter();
 
   const handleLogout = async () => {
     try {
@@ -71,11 +73,9 @@ export function AppSidebar() {
           <SidebarMenu>
             {links.map((link) => (
               <SidebarMenuItem key={link.title}>
-                <SidebarMenuButton asChild>
-                  <a href={link.url}>
-                    <link.icon />
-                    <span>{link.title}</span>
-                  </a>
+                <SidebarMenuButton onClick={() => router.push(link.url)}>
+                  <link.icon />
+                  <span>{link.title}</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}

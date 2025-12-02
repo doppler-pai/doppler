@@ -6,6 +6,7 @@ export type EnsurePlayerInLobbyParams = {
   gameId: string;
   playerId: string;
   nick: string;
+  skinId: string;
 };
 
 export type EnsurePlayerInLobbyResult =
@@ -13,6 +14,7 @@ export type EnsurePlayerInLobbyResult =
       success: true;
       alreadyJoined: boolean;
       nick: string;
+      skinId: string;
     }
   | {
       success: false;
@@ -23,6 +25,7 @@ export async function ensurePlayerInLobby({
   gameId,
   playerId,
   nick,
+  skinId,
 }: EnsurePlayerInLobbyParams): Promise<EnsurePlayerInLobbyResult> {
   const trimmedNick = nick.trim();
 
@@ -33,29 +36,44 @@ export async function ensurePlayerInLobby({
     };
   }
 
+  if (!skinId) {
+    return {
+      success: false,
+      error: 'Please select a skin.',
+    };
+  }
+
   try {
     const playersRef = child(ref(rtdb), `lobbies/${gameId}/players`);
     const snapshot = await get(playersRef);
-    const players = (snapshot.exists() ? snapshot.val() : {}) as Record<string, string>;
+    const players = (snapshot.exists() ? snapshot.val() : {}) as Record<string, { nick: string; skinId: string }>;
 
-    const existingNick = players[playerId];
+    const existingPlayer = players[playerId];
 
-    if (existingNick) {
+    if (existingPlayer) {
       return {
         success: true,
         alreadyJoined: true,
-        nick: existingNick,
+        nick: existingPlayer.nick,
+        skinId: existingPlayer.skinId,
       };
     }
 
+    // New player
+    const playerData = {
+      nick: trimmedNick,
+      skinId,
+    };
+
     await update(playersRef, {
-      [playerId]: trimmedNick,
+      [playerId]: playerData,
     });
 
     return {
       success: true,
       alreadyJoined: false,
       nick: trimmedNick,
+      skinId,
     };
   } catch (error) {
     console.error('Error ensuring player in lobby:', error);

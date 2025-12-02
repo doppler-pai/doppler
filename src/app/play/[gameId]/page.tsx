@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 
 import { Lobby } from '@/features/lobby/components/Lobby';
-import { checkGameExists } from '@/features/preLobby/services/checkGameExists';
+import { checkGameJoinable } from '@/features/preLobby/services/checkGameJoinable';
 import { ProtectedRoute } from '@/shared/components/auth/ProtectedRoute';
 
 type Status = 'checking' | 'not-found' | 'ok';
@@ -23,7 +23,7 @@ export default function PlayGamePage() {
         return;
       }
 
-      const exists = await checkGameExists(gameId);
+      const exists = await checkGameJoinable(gameId);
       setStatus(exists ? 'ok' : 'not-found');
     };
 

@@ -8,13 +8,15 @@ import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import { ensurePlayerInLobby } from '../services/ensurePlayerInLobby';
-import { getPlayerNick } from '../services/getPlayerNick';
+import { getPlayer } from '../services/getPlayer';
+import { SkinSelect } from './SkinSelect';
+import { PostLobby } from './PostLobby';
 
 type LobbyProps = {
   gameId: string;
 };
 
-type LobbyStatus = 'checking' | 'needs-name' | 'waiting';
+type LobbyStatus = 'checking' | 'missing' | 'waiting';
 
 type NickFormValues = {
   nick: string;
@@ -26,11 +28,12 @@ export function Lobby({ gameId }: LobbyProps) {
   const [status, setStatus] = useState<LobbyStatus>('checking');
   const [serverError, setServerError] = useState<string | null>(null);
   const [currentNick, setCurrentNick] = useState<string | null>(null);
+  const [selectedSkinId, setSelectedSkinId] = useState<string | null>(null);
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors, isValid },
     reset,
   } = useForm<NickFormValues>({
     defaultValues: {
@@ -42,23 +45,23 @@ export function Lobby({ gameId }: LobbyProps) {
     const run = async () => {
       if (!user?.uid) {
         setServerError('You must be logged in to join the lobby.');
-        setStatus('needs-name');
+        setStatus('missing');
         return;
       }
 
-      const result = await getPlayerNick(gameId, user.uid);
+      try {
+        const result = await getPlayer(gameId, user.uid);
+        if (!result) {
+          setStatus('missing');
+          return;
+        }
 
-      if (!result.success) {
-        setServerError(result.error);
-        setStatus('needs-name');
-        return;
-      }
-
-      if (result.nick) {
-        setCurrentNick(result.nick);
+        setCurrentNick(result.nick ?? null);
+        setSelectedSkinId(result.skinId ?? null);
         setStatus('waiting');
-      } else {
-        setStatus('needs-name');
+      } catch (error) {
+        console.error('Error reading player info:', error);
+        setStatus('missing');
       }
     };
 
@@ -71,12 +74,18 @@ export function Lobby({ gameId }: LobbyProps) {
       return;
     }
 
+    if (!selectedSkinId) {
+      setServerError('Please select a skin.');
+      return;
+    }
+
     setServerError(null);
 
     const result = await ensurePlayerInLobby({
       gameId,
       playerId: user.uid,
       nick: values.nick,
+      skinId: selectedSkinId,
     });
 
     if (!result.success) {
@@ -85,6 +94,7 @@ export function Lobby({ gameId }: LobbyProps) {
     }
 
     setCurrentNick(result.nick);
+    setSelectedSkinId(result.skinId);
     setStatus('waiting');
     reset({ nick: result.nick });
   };
@@ -97,7 +107,7 @@ export function Lobby({ gameId }: LobbyProps) {
         <p className="text-sm text-muted-foreground">Loading lobby...</p>
       </div>
     );
-  } else if (status === 'needs-name') {
+  } else if (status === 'missing') {
     content = (
       <div className="flex min-h-[70vh] w-full items-center justify-center px-4">
         <div className="w-full max-w-md rounded-xl border bg-bg-dark p-6 shadow-sm">
@@ -120,27 +130,34 @@ export function Lobby({ gameId }: LobbyProps) {
               {errors.nick ? <p className="text-xs text-destructive">{errors.nick.message}</p> : null}
             </div>
 
+            {user?.uid ? (
+              <SkinSelect userId={user.uid} selectedSkinId={selectedSkinId} onSelectSkin={setSelectedSkinId} />
+            ) : null}
+
             {serverError ? <p className="text-sm text-destructive">{serverError}</p> : null}
 
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? 'Joining…' : 'Join lobby'}
+            <Button type="submit" className="w-full" disabled={!isValid || !selectedSkinId}>
+              Join lobby
             </Button>
           </form>
         </div>
       </div>
     );
   } else {
-    content = (
-      <div className="flex min-h-[70vh] w-full items-center justify-center px-4">
-        <div className="w-full max-w-2xl rounded-xl border bg-bg-dark p-6 shadow-sm">
-          <h1 className="mb-2 text-2xl font-semibold">Lobby</h1>
-          <p className="mb-4 text-sm text-muted-foreground">Game ID: {gameId}</p>
-          <p className="mb-2 text-sm text-muted-foreground">
-            You are in the lobby{currentNick ? ` as ${currentNick}` : ''}. Waiting for the game to start…
-          </p>
+    content =
+      user?.uid && currentNick && selectedSkinId ? (
+        <PostLobby
+          gameId={gameId}
+          userId={user.uid}
+          nick={currentNick}
+          selectedSkinId={selectedSkinId}
+          onSkinChange={setSelectedSkinId}
+        />
+      ) : (
+        <div className="flex min-h-[70vh] w-full items-center justify-center px-4">
+          <p className="text-sm text-muted-foreground">Loading...</p>
         </div>
-      </div>
-    );
+      );
   }
 
   return content;

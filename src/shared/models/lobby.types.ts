@@ -10,11 +10,14 @@ export enum LobbyStatus {
   COMPLETED = 'COMPLETED',
 }
 
-export interface LobbyData {
+export type PlayerData = { id: string; nick: string; skinId: string };
+
+export type LobbyData = {
   hostId: string;
   setId: string;
   status: LobbyStatus;
   type: GameModeType;
   metadata: Record<string, unknown>;
   createdAt: number;
-}
+  players: Record<string, PlayerData>;
+};
