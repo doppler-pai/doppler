@@ -64,6 +64,7 @@ export function SkinSelect({ userId, selectedSkinId, onSelectSkin }: SkinSelectP
             <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
               {pack.skins.map((skin) => {
                 const isSelected = selectedSkinId === skin.id;
+                console.log(skin.image);
 
                 return (
                   <button

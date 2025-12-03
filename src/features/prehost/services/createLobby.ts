@@ -33,6 +33,7 @@ export async function createLobby(
 
     const lobbyData: Omit<LobbyData, 'createdAt'> & { createdAt: ReturnType<typeof serverTimestamp> } = {
       hostId: currentUserId,
+      players: {},
       setId: params.setId,
       status: LobbyStatus.QUEUED,
       type: params.type,
