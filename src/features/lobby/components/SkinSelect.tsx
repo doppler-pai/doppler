@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Label } from '@/shared/components/ui/label';
-import { getSkinSelectData } from '../services/getSkinSelectData';
+import { getSkinData } from '@/shared/services/getSkinData';
 import type { PackWithSkins } from '../models/skin.types';
 
 type SkinSelectProps = {
@@ -19,9 +19,7 @@ export function SkinSelect({ userId, selectedSkinId, onSelectSkin }: SkinSelectP
     const fetchData = async () => {
       setLoading(true);
 
-      const result = await getSkinSelectData(userId);
-
-      console.log('result', result);
+      const result = await getSkinData(userId);
 
       if (!result) {
         setLoading(false);

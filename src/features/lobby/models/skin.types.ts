@@ -1,3 +1,5 @@
+import type { Rarity } from '@/shared/models/rarity';
+
 /**
  * Represents a skin available in the game.
  */
@@ -10,11 +12,21 @@ export type Skin = {
 };
 
 /**
- * Grouped skins by pack ID.
+ * Config for a single rarity within a pack.
  */
-export type SkinPack = {
+export type RarityConfig = {
+  price: number;
+  image: string;
+};
+
+/**
+ * Raw pack data from Firestore.
+ */
+export type SkinPackData = {
   packId: string;
   name: string;
+  images: Record<Rarity, string>;
+  prices: Record<Rarity, number>;
 };
 
 /**
@@ -30,5 +42,6 @@ export type SkinWithOwnership = Skin & {
 export type PackWithSkins = {
   packName: string;
   packId: string;
+  rarities: Record<Rarity, RarityConfig>;
   skins: SkinWithOwnership[];
 };

@@ -1,16 +1,16 @@
 export enum GameModeType {
-  TIME = 'TIME',
-  QUIZ = 'QUIZ',
-  POINTS = 'POINTS',
+  TIME = 'time',
+  QUIZ = 'quiz',
+  POINTS = 'points',
 }
 
 export enum LobbyStatus {
-  QUEUED = 'QUEUED',
-  IN_PROGRESS = 'IN_PROGRESS',
-  COMPLETED = 'COMPLETED',
+  QUEUED = 'queued',
+  IN_PROGRESS = 'in_progress',
+  COMPLETED = 'completed',
 }
 
-export type PlayerData = { id: string; nick: string; skinId: string };
+export type PlayerData = { id?: string; nick?: string; skinId?: string };
 
 export type LobbyData = {
   hostId: string;

@@ -1,5 +1,5 @@
 import { ProtectedRoute } from '@/shared/components/auth/ProtectedRoute';
-import Market from '@/features/market/Market';
+import Market from '@/features/market/components/Market';
 
 export default function Page() {
   return (

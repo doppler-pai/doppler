@@ -154,3 +154,15 @@ small {
 #SetCard {
   box-shadow: 7px 7px 5px rgba(0, 0, 0, 0.25);
 }
+
+.gradient-common {
+  background: radial-gradient(circle at center 35%, #f1f1f9 0%, #00aaff 100%);
+}
+
+.gradient-epic {
+  background: radial-gradient(circle at center 35%, #f1f1f9 0%, #7b2cbf 100%);
+}
+
+.gradient-legendary {
+  background: radial-gradient(circle at center 35%, #f1f1f9 0%, #ff9e00 100%);
+}

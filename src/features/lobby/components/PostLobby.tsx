@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { SkinSelect } from './SkinSelect';
 import { updatePlayerSkin } from '../services/updatePlayerSkin';
-import { getSkinSelectData } from '../services/getSkinSelectData';
+import { getSkinData } from '@/shared/services/getSkinData';
 
 type PostLobbyProps = {
   gameId: string;
@@ -19,7 +19,7 @@ export const PostLobby = ({ gameId, userId, nick, selectedSkinId, onSkinChange }
 
   useEffect(() => {
     const fetchSkinImage = async () => {
-      const result = await getSkinSelectData(userId);
+      const result = await getSkinData(userId);
       if (!result) return;
 
       const allSkins = result.flatMap((pack) => pack.skins);
