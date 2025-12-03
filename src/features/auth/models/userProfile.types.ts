@@ -5,4 +5,5 @@ export type UserProfileData = {
   email: string | null;
   currency: 0;
   createdAt: Timestamp | FieldValue;
+  ownedSkinIds: string[];
 };
