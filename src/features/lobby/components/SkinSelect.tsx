@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { Label } from '@/shared/components/ui/label';
 import { getSkinData } from '@/shared/services/getSkinData';
 import type { PackWithSkins } from '../models/skin.types';
@@ -77,7 +78,7 @@ export function SkinSelect({ userId, selectedSkinId, onSelectSkin }: SkinSelectP
                     `}
                     title={`${skin.name} (${skin.rarity})`}
                   >
-                    <img src={skin.image} alt={skin.name} className="h-full w-full rounded-md object-cover" />
+                    <Image src={skin.image} alt={skin.name} fill className="rounded-md object-cover" />
                     {!skin.isOwned && (
                       <div className="absolute inset-0 flex items-center justify-center rounded-md bg-black/60">
                         <span className="text-xs font-semibold text-white">🔒</span>

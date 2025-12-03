@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { SkinSelect } from './SkinSelect';
 import { updatePlayerSkin } from '../services/updatePlayerSkin';
 import { getSkinData } from '@/shared/services/getSkinData';
+import { PlayerCard } from '@/shared/components/player/PlayerCard';
 
 type PostLobbyProps = {
   gameId: string;
@@ -52,17 +53,11 @@ export const PostLobby = ({ gameId, userId, nick, selectedSkinId, onSkinChange }
       <div className="w-full max-w-2xl rounded-xl border bg-bg-dark p-6 shadow-sm">
         <h1 className="mb-6 text-2xl font-semibold">Lobby</h1>
 
-        <div className="mb-6 flex items-center gap-4">
-          {skinImageUrl && (
-            <div className="h-16 w-16 overflow-hidden rounded-lg border-2 border-border">
-              <img src={skinImageUrl} alt={nick} className="h-full w-full object-cover" />
-            </div>
-          )}
-          <div>
-            <p className="text-sm text-muted">Your nickname</p>
-            <h4>{nick}</h4>
+        {skinImageUrl && (
+          <div className="mb-6">
+            <PlayerCard image={skinImageUrl} nick={nick} />
           </div>
-        </div>
+        )}
 
         <div className="space-y-4">
           <SkinSelect userId={userId} selectedSkinId={selectedSkinId} onSelectSkin={handleSkinSelect} />
