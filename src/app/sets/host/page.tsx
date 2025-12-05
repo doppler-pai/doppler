@@ -9,7 +9,7 @@ import { getSetPermissions } from '@/shared/services/getSetPermissions';
 
 type Status = 'checking' | 'not-found' | 'ok';
 
-export default function HostSetPage() {
+export default function PreHostSetPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const setId = searchParams.get('setId');

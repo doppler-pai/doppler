@@ -17,10 +17,23 @@ interface PlayerPhysics extends PlayerWithSkin {
   vx: number;
   vy: number;
   radius: number;
+  width: number; // Actual measured width
+  height: number; // Actual measured height
 }
 
-const CARD_SIZE = 80; // Card radius in pixels
-const BOUNCE_DAMPING = 0.9; // Energy loss on collision
+interface Particle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  life: number; // 0 to 1
+  size: number;
+  hue: number;
+}
+
+const BOUNCE_DAMPING = 0.8; // Energy loss on collision
+const MAX_PARTICLES = 200; // Limit particles for performance
+const PARTICLE_SPAWN_RATE = 0.3; // Probability per frame when player is moving
 
 export function Host({ gameId }: HostProps) {
   const [players, setPlayers] = useState<PlayerWithSkin[]>([]);
@@ -28,6 +41,9 @@ export function Host({ gameId }: HostProps) {
   const [playerPositions, setPlayerPositions] = useState<PlayerPhysics[]>([]);
   const animationRef = useRef<number | undefined>(undefined);
   const containerRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const particlesRef = useRef<Particle[]>([]);
 
   // Fetch players data
   useEffect(() => {
@@ -60,17 +76,21 @@ export function Host({ gameId }: HostProps) {
       players.forEach((player) => {
         const existing = prev.find((p) => p.id === player.id);
         if (existing) {
-          // Keep existing physics
+          // Keep existing physics but update player data
           newPositions.push({ ...player, ...existing });
         } else {
-          // Initialize new player with random position and velocity
+          // Initialize new player with default size (will be measured after render)
+          const defaultWidth = 200;
+          const defaultHeight = 80;
           newPositions.push({
             ...player,
-            x: Math.random() * (width - CARD_SIZE * 2) + CARD_SIZE,
-            y: Math.random() * (height - CARD_SIZE * 2) + CARD_SIZE,
-            vx: (Math.random() - 0.5) * 4,
-            vy: (Math.random() - 0.5) * 4,
-            radius: CARD_SIZE,
+            x: Math.random() * (width - defaultWidth) + defaultWidth / 2,
+            y: Math.random() * (height - defaultHeight) + defaultHeight / 2,
+            vx: (Math.random() - 0.5) * 100,
+            vy: (Math.random() - 0.5) * 100,
+            radius: Math.max(defaultWidth, defaultHeight) / 2,
+            width: defaultWidth,
+            height: defaultHeight,
           });
         }
       });
@@ -79,9 +99,57 @@ export function Host({ gameId }: HostProps) {
     });
   }, [players]);
 
-  // Physics animation loop
+  // Measure actual card sizes after render
+  useEffect(() => {
+    if (playerPositions.length === 0) return;
+
+    const measureCards = () => {
+      setPlayerPositions((prev) =>
+        prev.map((player) => {
+          const cardElement = cardRefs.current.get(player.id || '');
+          if (cardElement) {
+            const rect = cardElement.getBoundingClientRect();
+            const width = rect.width;
+            const height = rect.height;
+            const radius = Math.max(width, height) / 2;
+
+            // Only update if significantly different
+            if (Math.abs(player.width - width) > 5 || Math.abs(player.height - height) > 5) {
+              return { ...player, width, height, radius };
+            }
+          }
+          return player;
+        }),
+      );
+    };
+
+    // Measure after a short delay to ensure DOM is rendered
+    const timeout = setTimeout(measureCards, 100);
+    return () => clearTimeout(timeout);
+  }, [playerPositions.length]);
+
+  // Setup canvas size
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
+
+    const updateCanvasSize = () => {
+      canvas.width = container.clientWidth;
+      canvas.height = container.clientHeight;
+    };
+
+    updateCanvasSize();
+    window.addEventListener('resize', updateCanvasSize);
+    return () => window.removeEventListener('resize', updateCanvasSize);
+  }, []);
+
+  // Physics animation loop with particles
   useEffect(() => {
     if (!containerRef.current || playerPositions.length === 0) return;
+
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d');
 
     const animate = () => {
       const width = containerRef.current!.clientWidth;
@@ -94,73 +162,124 @@ export function Host({ gameId }: HostProps) {
           y: player.y + player.vy,
         }));
 
+        // Generate particles for moving players
+        if (particlesRef.current.length < MAX_PARTICLES) {
+          updated.forEach((player) => {
+            const speed = Math.sqrt(player.vx * player.vx + player.vy * player.vy);
+            if (speed > 2 && Math.random() < PARTICLE_SPAWN_RATE) {
+              particlesRef.current.push({
+                x: player.x + (Math.random() - 0.5) * player.width * 0.5,
+                y: player.y + (Math.random() - 0.5) * player.height * 0.5,
+                vx: (Math.random() - 0.5) * 2,
+                vy: (Math.random() - 0.5) * 2,
+                life: 1,
+                size: Math.random() * 3 + 2,
+                hue: Math.random() * 60 + 180, // Blue-ish tones
+              });
+            }
+          });
+        }
+
         // Wall collision detection
         updated.forEach((player) => {
-          if (player.x - player.radius <= 0) {
-            player.x = player.radius;
+          const halfWidth = player.width / 2;
+          const halfHeight = player.height / 2;
+
+          if (player.x - halfWidth <= 0) {
+            player.x = halfWidth;
             player.vx = Math.abs(player.vx) * BOUNCE_DAMPING;
-          } else if (player.x + player.radius >= width) {
-            player.x = width - player.radius;
+          } else if (player.x + halfWidth >= width) {
+            player.x = width - halfWidth;
             player.vx = -Math.abs(player.vx) * BOUNCE_DAMPING;
           }
 
-          if (player.y - player.radius <= 0) {
-            player.y = player.radius;
+          if (player.y - halfHeight <= 0) {
+            player.y = halfHeight;
             player.vy = Math.abs(player.vy) * BOUNCE_DAMPING;
-          } else if (player.y + player.radius >= height) {
-            player.y = height - player.radius;
+          } else if (player.y + halfHeight >= height) {
+            player.y = height - halfHeight;
             player.vy = -Math.abs(player.vy) * BOUNCE_DAMPING;
           }
         });
 
-        // Player-to-player collision detection
+        // Player-to-player collision detection (AABB - Axis Aligned Bounding Box)
         for (let i = 0; i < updated.length; i++) {
           for (let j = i + 1; j < updated.length; j++) {
             const p1 = updated[i];
             const p2 = updated[j];
 
-            const dx = p2.x - p1.x;
-            const dy = p2.y - p1.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            const minDistance = p1.radius + p2.radius;
+            // Calculate bounding boxes
+            const p1Left = p1.x - p1.width / 2;
+            const p1Right = p1.x + p1.width / 2;
+            const p1Top = p1.y - p1.height / 2;
+            const p1Bottom = p1.y + p1.height / 2;
 
-            if (distance < minDistance) {
-              // Collision detected - elastic collision
-              const angle = Math.atan2(dy, dx);
-              const sin = Math.sin(angle);
-              const cos = Math.cos(angle);
+            const p2Left = p2.x - p2.width / 2;
+            const p2Right = p2.x + p2.width / 2;
+            const p2Top = p2.y - p2.height / 2;
+            const p2Bottom = p2.y + p2.height / 2;
 
-              // Rotate velocities
-              const vx1 = p1.vx * cos + p1.vy * sin;
-              const vy1 = p1.vy * cos - p1.vx * sin;
-              const vx2 = p2.vx * cos + p2.vy * sin;
-              const vy2 = p2.vy * cos - p2.vx * sin;
+            // Check for overlap
+            if (p1Right > p2Left && p1Left < p2Right && p1Bottom > p2Top && p1Top < p2Bottom) {
+              // Collision detected - calculate centers and distance
+              const dx = p2.x - p1.x;
+              const dy = p2.y - p1.y;
 
-              // Swap x velocities (elastic collision)
-              const vx1Final = vx2 * BOUNCE_DAMPING;
-              const vx2Final = vx1 * BOUNCE_DAMPING;
+              // Calculate overlap amounts
+              const overlapX = p1Right > p2Left && p1Left < p2Right ? Math.min(p1Right - p2Left, p2Right - p1Left) : 0;
+              const overlapY = p1Bottom > p2Top && p1Top < p2Bottom ? Math.min(p1Bottom - p2Top, p2Bottom - p1Top) : 0;
 
-              // Rotate back
-              p1.vx = vx1Final * cos - vy1 * sin;
-              p1.vy = vy1 * cos + vx1Final * sin;
-              p2.vx = vx2Final * cos - vy2 * sin;
-              p2.vy = vy2 * cos + vx2Final * sin;
+              // Separate along the axis with least overlap
+              if (overlapX < overlapY) {
+                // Separate horizontally
+                const separationX = (overlapX / 2) * (dx > 0 ? 1 : -1);
+                p1.x -= separationX;
+                p2.x += separationX;
 
-              // Separate overlapping players
-              const overlap = minDistance - distance;
-              const separationX = (overlap * cos) / 2;
-              const separationY = (overlap * sin) / 2;
+                // Swap horizontal velocities
+                const temp = p1.vx;
+                p1.vx = p2.vx * BOUNCE_DAMPING;
+                p2.vx = temp * BOUNCE_DAMPING;
+              } else {
+                // Separate vertically
+                const separationY = (overlapY / 2) * (dy > 0 ? 1 : -1);
+                p1.y -= separationY;
+                p2.y += separationY;
 
-              p1.x -= separationX;
-              p1.y -= separationY;
-              p2.x += separationX;
-              p2.y += separationY;
+                // Swap vertical velocities
+                const temp = p1.vy;
+                p1.vy = p2.vy * BOUNCE_DAMPING;
+                p2.vy = temp * BOUNCE_DAMPING;
+              }
             }
           }
         }
 
         return updated;
       });
+
+      // Update and render particles
+      if (ctx && canvas) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Update particles
+        particlesRef.current = particlesRef.current
+          .map((particle) => ({
+            ...particle,
+            x: particle.x + particle.vx,
+            y: particle.y + particle.vy,
+            life: particle.life - 0.015,
+          }))
+          .filter((particle) => particle.life > 0);
+
+        // Render particles
+        particlesRef.current.forEach((particle) => {
+          ctx.beginPath();
+          ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+          ctx.fillStyle = `hsla(${particle.hue}, 70%, 60%, ${particle.life * 0.6})`;
+          ctx.fill();
+        });
+      }
 
       animationRef.current = requestAnimationFrame(animate);
     };
@@ -179,23 +298,55 @@ export function Host({ gameId }: HostProps) {
     console.log('Starting game...');
   };
 
+  const handleBoost = () => {
+    setPlayerPositions((prev) =>
+      prev.map((player) => ({
+        ...player,
+        vx: player.vx * 1.5 + (Math.random() - 0.5) * 50,
+        vy: player.vy * 1.5 + (Math.random() - 0.5) * 50,
+      })),
+    );
+  };
+
+  const handlePlayerClick = (playerId: string | undefined) => {
+    if (!playerId) return;
+
+    setPlayerPositions((prev) =>
+      prev.map((player) =>
+        player.id === playerId
+          ? {
+              ...player,
+              vx: player.vx * 1.3 + (Math.random() - 0.5) * 80,
+              vy: player.vy * 1.3 + (Math.random() - 0.5) * 80,
+            }
+          : player,
+      ),
+    );
+  };
+
   return (
     <main ref={containerRef} className="flex h-screen w-full relative items-center justify-center overflow-hidden">
+      {/* Particle canvas - furthest back */}
+      <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }} />
+
       {/* Flying player cards - behind the text */}
       {playerPositions.map((player) => (
         <div
           key={player.id}
-          className="absolute z-0 transition-transform"
+          ref={(el) => {
+            if (el && player.id) {
+              cardRefs.current.set(player.id, el);
+            }
+          }}
+          onClick={() => handlePlayerClick(player.id)}
+          className="absolute cursor-pointer hover:scale-105 transition-transform active:scale-95"
           style={{
-            left: `${player.x - CARD_SIZE}px`,
-            top: `${player.y - CARD_SIZE}px`,
-            width: `${CARD_SIZE * 2}px`,
-            height: `${CARD_SIZE * 2}px`,
+            zIndex: 1,
+            left: `${player.x - player.width / 2}px`,
+            top: `${player.y - player.height / 2}px`,
           }}
         >
-          <div className="w-full h-full flex items-center justify-center">
-            <PlayerCard nick={player.nick || 'Player'} image={player.skinImage || '/placeholder.png'} />
-          </div>
+          <PlayerCard nick={player.nick || 'Player'} image={player.skinImage || '/skins/clashRoyale/golem.png'} />
         </div>
       ))}
 
@@ -207,9 +358,14 @@ export function Host({ gameId }: HostProps) {
           {loading ? 'Loading...' : `${players.length} ${players.length === 1 ? 'Player' : 'Players'}`} <User />
         </h4>
 
-        <Button size="lg" onClick={handlePlay} disabled={players.length === 0} className="mt-4">
-          Play
-        </Button>
+        <div className="flex gap-3 mt-4">
+          <Button size="lg" onClick={handleBoost} disabled={players.length === 0} variant="outline">
+            🚀 Boost
+          </Button>
+          <Button size="lg" onClick={handlePlay} disabled={players.length === 0}>
+            Play
+          </Button>
+        </div>
       </div>
     </main>
   );

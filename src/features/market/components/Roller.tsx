@@ -83,6 +83,8 @@ export default function Roller({ rarity, skins, onFinish }: RollerProps) {
     return <p className="text-center">No skins available</p>;
   }
 
+  console.log(skins);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
       <div className="bg-[#111] rounded-xl p-8 shadow-2xl border border-white/10 w-[80%] max-w-4xl">

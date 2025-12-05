@@ -4,6 +4,7 @@ import './globals.css';
 import { AppSidebar } from '@/shared/components/layout/AppSidebar';
 import { SidebarProvider } from '@/shared/components/ui/sidebar';
 import { AuthProvider } from '@/shared/context/AuthContext';
+import { LayoutContent } from '@/shared/components/layout/LayoutContent';
 
 const roboto = Roboto({
   variable: '--font-roboto-sans',
@@ -24,10 +25,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${roboto.variable} ${roboto.variable} text-text antialiased`}>
         <AuthProvider>
-          <SidebarProvider>
+          <LayoutContent>
             <AppSidebar />
             <main className="w-full">{children}</main>
-          </SidebarProvider>
+          </LayoutContent>
         </AuthProvider>
       </body>
     </html>
