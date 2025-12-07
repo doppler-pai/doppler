@@ -1,6 +1,7 @@
 'use client';
 
 import { Host } from './host/components/Host';
+import { HostGameRoot } from './hostGame/components/HostGameRoot';
 import { useLobbyState } from '@/shared/hooks/useLobbyState';
 import { LobbyStatus } from '@/shared/models/lobby.types';
 
@@ -51,11 +52,7 @@ export function HostRoot({ gameId }: HostRootProps) {
   }
 
   if (status === LobbyStatus.IN_PROGRESS) {
-    return (
-      <div className="flex min-h-[70vh] w-full items-center justify-center px-4">
-        <p>Lobby is in progress.</p>
-      </div>
-    );
+    return <HostGameRoot gameId={gameId} gameType={lobbyState!.gameType} />;
   }
 
   if (status === LobbyStatus.COMPLETED) {

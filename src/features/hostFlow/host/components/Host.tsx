@@ -5,6 +5,7 @@ import { Button } from '@/shared/components/ui/button';
 import { useGamePlayers } from '../hooks/useGamePlayers';
 import { usePlayerPhysics } from '../hooks/usePlayerPhysics';
 import { useParticleSystem } from '../hooks/useParticleSystem';
+import { startGame } from '../services/startGame';
 import { User } from 'lucide-react';
 import { PlayerCard } from '@/shared/components/player/PlayerCard';
 
@@ -29,8 +30,7 @@ export function Host({ gameId }: HostProps) {
   });
 
   const handlePlay = () => {
-    // TODO: Start the game
-    console.log('Starting game...');
+    startGame(gameId);
   };
 
   return (

@@ -26,7 +26,6 @@ export default function PreHostSetPage() {
 
       // Check set permissions
       const permissions = await getSetPermissions(setId);
-      console.log(permissions);
       setStatus(permissions.read ? 'ok' : 'not-found');
     };
 

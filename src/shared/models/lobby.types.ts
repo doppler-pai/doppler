@@ -12,6 +12,11 @@ export enum LobbyStatus {
 
 export type PlayerData = { id?: string; nick?: string; skinId?: string };
 
+export type QuizMetadata = {
+  currentRound: number;
+  points: Record<string, number>;
+};
+
 export type LobbyData = {
   hostId: string;
   setId: string;

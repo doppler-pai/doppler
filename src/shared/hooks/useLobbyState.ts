@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react';
 import { ref, onValue } from 'firebase/database';
 
 import { auth, rtdb } from '@/shared/lib/firebase';
-import { LobbyData, LobbyStatus } from '@/shared/models/lobby.types';
+import { GameModeType, LobbyData, LobbyStatus } from '@/shared/models/lobby.types';
 
 export type LobbyState = {
   isHost: boolean;
   isPlayer: boolean;
   status: LobbyStatus;
+  gameType: GameModeType;
 };
 
 /**
@@ -56,6 +57,7 @@ export function useLobbyState(gameId: string): LobbyState | null {
           isHost,
           isPlayer,
           status: lobbyData.status,
+          gameType: lobbyData.type,
         });
       },
       (error) => {
