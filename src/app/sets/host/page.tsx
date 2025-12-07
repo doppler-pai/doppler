@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-import { PreHostForm } from '@/features/prehost/components/PreHostForm';
 import { ProtectedRoute } from '@/shared/components/auth/ProtectedRoute';
 import { getSetPermissions } from '@/shared/services/getSetPermissions';
+import { PreHostForm } from '@/features/hostFlow/prehost/components/PreHostForm';
 
 type Status = 'checking' | 'not-found' | 'ok';
 

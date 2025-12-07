@@ -7,7 +7,7 @@ import type {
   PackWithSkins,
   SkinWithOwnership,
   RarityConfig,
-} from '@/features/lobby/models/skin.types';
+} from '@/features/playerFlow/lobby/models/skin.types';
 import type { Rarity } from '@/shared/models/rarity';
 
 /**

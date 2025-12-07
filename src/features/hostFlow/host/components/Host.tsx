@@ -2,13 +2,12 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { Button } from '@/shared/components/ui/button';
-import { getGamePlayers, PlayerWithSkin } from '../services/getGamePlayers';
+import { useGamePlayers, PlayerWithSkin } from '../hooks/useGamePlayers';
 import { User } from 'lucide-react';
 import { PlayerCard } from '@/shared/components/player/PlayerCard';
 
 interface HostProps {
   gameId: string;
-  setId: string;
 }
 
 interface PlayerPhysics extends PlayerWithSkin {
@@ -36,8 +35,7 @@ const MAX_PARTICLES = 200; // Limit particles for performance
 const PARTICLE_SPAWN_RATE = 0.3; // Probability per frame when player is moving
 
 export function Host({ gameId }: HostProps) {
-  const [players, setPlayers] = useState<PlayerWithSkin[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { players, loading } = useGamePlayers(gameId);
   const [playerPositions, setPlayerPositions] = useState<PlayerPhysics[]>([]);
   const animationRef = useRef<number | undefined>(undefined);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -45,27 +43,16 @@ export function Host({ gameId }: HostProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const particlesRef = useRef<Particle[]>([]);
 
-  // Fetch players data
-  useEffect(() => {
-    const fetchPlayers = async () => {
-      const gamePlayers = await getGamePlayers(gameId);
-      setPlayers(gamePlayers);
-      setLoading(false);
-    };
-
-    void fetchPlayers();
-
-    // Poll for new players every 2 seconds
-    const interval = setInterval(() => {
-      void fetchPlayers();
-    }, 2000);
-
-    return () => clearInterval(interval);
-  }, [gameId]);
-
   // Initialize physics for new players
   useEffect(() => {
-    if (!containerRef.current || players.length === 0) return;
+    if (!containerRef.current) return;
+
+    // Clear positions if no players
+    if (players.length === 0) {
+      // Use microtask to avoid synchronous setState
+      Promise.resolve().then(() => setPlayerPositions([]));
+      return;
+    }
 
     const width = containerRef.current.clientWidth;
     const height = containerRef.current.clientHeight;
@@ -76,8 +63,8 @@ export function Host({ gameId }: HostProps) {
       players.forEach((player) => {
         const existing = prev.find((p) => p.id === player.id);
         if (existing) {
-          // Keep existing physics but update player data
-          newPositions.push({ ...player, ...existing });
+          // Keep existing physics but update player data (skinId, nick, skinImage)
+          newPositions.push({ ...existing, ...player });
         } else {
           // Initialize new player with default size (will be measured after render)
           const defaultWidth = 200;
@@ -338,7 +325,7 @@ export function Host({ gameId }: HostProps) {
               cardRefs.current.set(player.id, el);
             }
           }}
-          onClick={() => handlePlayerClick(player.id)}
+          onMouseDown={() => handlePlayerClick(player.id)}
           className="absolute cursor-pointer hover:scale-105 transition-transform active:scale-95"
           style={{
             zIndex: 1,

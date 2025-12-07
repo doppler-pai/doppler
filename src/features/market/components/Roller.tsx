@@ -3,7 +3,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import { Rarity, RARITY_RATES, RARITY_REFUND } from '@/shared/models/rarity';
-import type { SkinWithOwnership } from '@/features/lobby/models/skin.types';
+import type { SkinWithOwnership } from '@/features/playerFlow/lobby/models/skin.types';
 
 export type RollResult = {
   skin: SkinWithOwnership;

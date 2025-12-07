@@ -8,7 +8,8 @@ import { Controller, useForm } from 'react-hook-form';
 import { Button } from '@/shared/components/ui/button';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/shared/components/ui/input-otp';
 import { Label } from '@/shared/components/ui/label';
-import { checkGameJoinable } from '../services/checkGameJoinable';
+import { checkLobbyState } from '@/shared/services/checkLobbyState';
+import { LobbyStatus } from '@/shared/models/lobby.types';
 
 type PreLobbyFormValues = {
   gameId: string;
@@ -34,9 +35,10 @@ export const PreLobbyInput = () => {
     // Frontend validation already guarantees length, but we can be defensive.
     const trimmed = values.gameId.trim();
 
-    const exists = await checkGameJoinable(trimmed);
-    if (!exists) {
-      setServerError('Game not found. Check the ID and try again.');
+    const lobbyState = await checkLobbyState(trimmed);
+    console.log(lobbyState);
+    if (!lobbyState || lobbyState.status !== LobbyStatus.QUEUED) {
+      setServerError('Game not found or in progress. Check the ID and try again.');
       return;
     }
 

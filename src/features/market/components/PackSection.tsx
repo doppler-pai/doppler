@@ -1,7 +1,7 @@
 import { Separator } from '@/shared/components/ui/separator';
 import { PackCard } from './PackCard';
 import { Rarity, RARITIES } from '@/shared/models/rarity';
-import type { RarityConfig } from '@/features/lobby/models/skin.types';
+import type { RarityConfig } from '@/features/playerFlow/lobby/models/skin.types';
 
 type PackSectionProps = {
   packName: string;

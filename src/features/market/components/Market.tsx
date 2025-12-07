@@ -9,7 +9,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { Rarity } from '@/shared/models/rarity';
 import { handleBuyService } from '../services/handleBuy';
 import { getSkinData } from '@/shared/services/getSkinData';
-import type { PackWithSkins, SkinWithOwnership } from '@/features/lobby/models/skin.types';
+import type { PackWithSkins, SkinWithOwnership } from '@/features/playerFlow/lobby/models/skin.types';
 
 import { Button } from '@/shared/components/ui/button';
 import { PackSection } from './PackSection';

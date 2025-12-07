@@ -1,4 +1,4 @@
-import { PreLobbyInput } from '@/features/preLobby/components/PreLobbyInput';
+import { PreLobbyInput } from '@/features/playerFlow/preLobby/components/PreLobbyInput';
 import { ProtectedRoute } from '@/shared/components/auth/ProtectedRoute';
 
 export default function PlayPage() {

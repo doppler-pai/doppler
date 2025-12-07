@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Roller, { type RollResult } from '@/features/market/components/Roller';
 import { Rarity } from '@/shared/models/rarity';
-import type { SkinWithOwnership } from '@/features/lobby/models/skin.types';
+import type { SkinWithOwnership } from '@/features/playerFlow/lobby/models/skin.types';
 
 type OpenPackProps = {
   rarity: Rarity;
