@@ -27,9 +27,21 @@ const PACK_RATES: Record<PackType, { common: number, epic: number, legendary: nu
 };
 
 const RARITY_COLORS = {
-  common: 'border-gray-400',
-  epic: 'border-purple-500',
-  legendary: 'border-yellow-400',
+  common: {
+    border: 'border-gray-400',
+    glow: 'shadow-[0_0_15px_rgba(156,163,175,0.4)]',
+    bg: 'bg-gray-400/5'
+  },
+  epic: {
+    border: 'border-purple-500',
+    glow: 'shadow-[0_0_20px_rgba(168,85,247,0.5)]',
+    bg: 'bg-purple-500/5'
+  },
+  legendary: {
+    border: 'border-yellow-400',
+    glow: 'shadow-[0_0_25px_rgba(250,204,21,0.6)]',
+    bg: 'bg-yellow-400/5'
+  }
 };
 
 export default function Roller({ packType, onFinish }: RollerProps) {
@@ -134,33 +146,41 @@ export default function Roller({ packType, onFinish }: RollerProps) {
 
   if (!skins) {
     return (
-      <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 text-white text-xl">
-        Loading...
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-black backdrop-blur-sm">
+        <div className="text-white text-2xl font-semibold animate-pulse">Loading pack...</div>
       </div>
     );
   }
 
   if (showResult && rolledSkin) {
-    const color = RARITY_COLORS[rolledRarity];
+    const colors = RARITY_COLORS[rolledRarity];
 
     return (
-      <div className="fixed inset-0 z-[9999] bg-black/90 flex items-center justify-center">
-        <div className={`p-10 rounded-3xl border-4 ${color} bg-gray-900`}>
-          <h1 className="text-white text-3xl text-center mb-6 font-bold">
-            You got:
-          </h1>
-
-          <div className="w-64 h-64 mx-auto border-4 rounded-xl flex items-center justify-center bg-black">
-            <img src={rolledSkin.image} className="w-full h-full object-contain" />
+      <div className="fixed inset-0 z-[9999] bg-gradient-to-br from-black via-gray-900 to-black flex items-center justify-center backdrop-blur-md">
+        <div className={`relative p-12 rounded-3xl border-4 ${colors.border} ${colors.glow} bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 max-w-2xl`}>
+          <div className="absolute -top-6 left-1/2 -translate-x-1/2">
+            <div className={`px-8 py-2 rounded-full border-2 ${colors.border} ${colors.bg} backdrop-blur-sm`}>
+              <span className="text-white font-bold text-lg uppercase tracking-wider">
+                {rolledRarity}
+              </span>
+            </div>
           </div>
 
-          <h2 className="text-white text-center text-2xl mt-6 font-bold">
+          <h1 className="text-white text-4xl text-center mb-8 mt-4 font-bold tracking-wide">
+            You Got:
+          </h1>
+
+          <div className={`w-64 h-64 mx-auto border-4 ${colors.border} ${colors.glow} rounded-2xl flex items-center justify-center ${colors.bg} p-4`}>
+            <img src={rolledSkin.image} className="w-full h-full object-contain drop-shadow-2xl" />
+          </div>
+
+          <h2 className="text-white text-center text-3xl mt-8 font-bold">
             {rolledSkin.name}
           </h2>
 
           <button
             onClick={() => onFinish(rolledSkin)}
-            className="block mt-8 mx-auto px-8 py-4 bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-xl"
+            className={`block mt-10 mx-auto px-12 py-4 bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white font-bold rounded-xl transition-all duration-200 hover:scale-105 border-2 ${colors.border}`}
           >
             Continue
           </button>
@@ -170,37 +190,56 @@ export default function Roller({ packType, onFinish }: RollerProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80">
-      <div className="w-[80%] max-w-5xl bg-gray-800 p-10 rounded-xl">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-black backdrop-blur-sm">
+      <div className="w-[80%] max-w-5xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-10 rounded-2xl shadow-2xl border border-white/20">
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 via-blue-500/5 to-pink-500/5 animate-pulse rounded-2xl pointer-events-none"></div>
 
-        <h1 className="text-center text-white text-2xl font-bold mb-8">
-          Rolling...
-        </h1>
+        <div className="relative z-10">
+          <h1 className="text-center text-white text-3xl font-bold mb-2 tracking-wide">
+            Opening {packType.charAt(0).toUpperCase() + packType.slice(1)} Pack
+          </h1>
+          <p className="text-center text-gray-400 text-sm mb-8">Watch carefully...</p>
 
-        <div className="relative w-full h-40 bg-black overflow-hidden rounded-lg border border-white/20">
-          
-          <div ref={containerRef} className="flex items-center">
-            {strip.map((skin, i) => {
-              const rarity = getRarityForSkin(skin);
-              const color = RARITY_COLORS[rarity];
+          <div className="relative w-full h-48 bg-black/70 overflow-hidden rounded-xl border border-white/10 shadow-inner">
+            <div className="absolute left-0 top-0 w-32 h-full bg-gradient-to-r from-black/70 to-transparent z-10 pointer-events-none"></div>
+            <div className="absolute right-0 top-0 w-32 h-full bg-gradient-to-l from-black/70 to-transparent z-10 pointer-events-none"></div>
 
-              return (
+            <div ref={containerRef} className="flex items-center h-full py-8 will-change-transform">
+              {strip.map((skin, i) => {
+                const rarity = getRarityForSkin(skin);
+                const colors = RARITY_COLORS[rarity];
+
+                return (
+                  <div
+                    key={i}
+                    ref={i === 0 ? itemRef : null}
+                    className={`flex-shrink-0 w-32 h-32 border-2 ${colors.border} ${colors.bg} ${colors.glow} rounded-lg flex items-center justify-center p-2`}
+                    style={{
+                      margin: 0,
+                      padding: '8px',
+                    }}
+                  >
+                    <img src={skin.image} className="w-full h-full object-contain drop-shadow-lg" />
+                  </div>
+                );
+              })}
+            </div>
+            <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-transparent via-white to-transparent opacity-80 -translate-x-1/2 z-20"></div>
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 border-4 border-white rounded-xl shadow-[0_0_30px_rgba(255,255,255,0.5)] z-20 pointer-events-none">
+              <div className="absolute inset-0 bg-white/5 rounded-lg"></div>
+            </div>
+          </div>
+          <div className="mt-6 flex justify-center">
+            <div className="flex gap-2">
+              {[...Array(3)].map((_, i) => (
                 <div
                   key={i}
-                  ref={i === 0 ? itemRef : null}
-                  className={`flex-shrink-0 w-32 h-32 border-4 ${color} bg-gray-900 flex items-center justify-center`}
-                  style={{
-                    margin: 0,
-                    padding: 0,
-                  }}
-                >
-                  <img src={skin.image} className="w-full h-full object-contain" />
-                </div>
-              );
-            })}
+                  className="w-2 h-2 rounded-full bg-white/30 animate-pulse"
+                  style={{ animationDelay: `${i * 0.15}s` }}
+                ></div>
+              ))}
+            </div>
           </div>
-
-          <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-white/70 -translate-x-1/2"></div>
         </div>
       </div>
     </div>
