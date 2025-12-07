@@ -3,13 +3,13 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-import { PreHostForm } from '@/features/prehost/components/PreHostForm';
 import { ProtectedRoute } from '@/shared/components/auth/ProtectedRoute';
 import { getSetPermissions } from '@/shared/services/getSetPermissions';
+import { PreHostForm } from '@/features/hostFlow/prehost/components/PreHostForm';
 
 type Status = 'checking' | 'not-found' | 'ok';
 
-export default function HostSetPage() {
+export default function PreHostSetPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const setId = searchParams.get('setId');
@@ -26,7 +26,6 @@ export default function HostSetPage() {
 
       // Check set permissions
       const permissions = await getSetPermissions(setId);
-      console.log(permissions);
       setStatus(permissions.read ? 'ok' : 'not-found');
     };
 

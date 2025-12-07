@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { Gamepad2, Bot, Store, List, PlusSquare } from 'lucide-react';
+import { Gamepad2, Bot, Store, List, PlusSquare, LogOut } from 'lucide-react';
 
 import {
   Sidebar,
@@ -16,6 +16,7 @@ import {
 } from '@/shared/components/ui/sidebar';
 import { Button } from '@/shared/components/ui/button';
 import { useAuth } from '@/shared/hooks/useAuth';
+import { useRouter } from 'next/navigation';
 
 const links = [
   {
@@ -35,7 +36,7 @@ const links = [
   },
   {
     title: 'Sets',
-    url: '#',
+    url: '/sets',
     icon: List,
   },
   {
@@ -48,6 +49,7 @@ const links = [
 export function AppSidebar() {
   const { open } = useSidebar();
   const { user, logout } = useAuth();
+  const router = useRouter();
 
   const handleLogout = async () => {
     try {
@@ -71,11 +73,9 @@ export function AppSidebar() {
           <SidebarMenu>
             {links.map((link) => (
               <SidebarMenuItem key={link.title}>
-                <SidebarMenuButton asChild>
-                  <a href={link.url}>
-                    <link.icon />
-                    <span>{link.title}</span>
-                  </a>
+                <SidebarMenuButton onClick={() => router.push(link.url)}>
+                  <link.icon />
+                  <span>{link.title}</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
@@ -84,17 +84,23 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter>
         {user ? (
-          <div className="flex items-center justify-between gap-2 text-xs">
-            <div className="min-w-0 flex-1">
-              <p className="truncate font-medium">{user.email ?? 'Signed in'}</p>
+          open ? (
+            <div className="flex items-center justify-between gap-2 text-xs">
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-medium">{user.email ?? 'Signed in'}</p>
+              </div>
+              <Button size="sm" variant="ghost" onClick={handleLogout}>
+                Logout
+              </Button>
             </div>
-            <Button size="sm" variant="ghost" onClick={handleLogout}>
-              Logout
+          ) : (
+            <Button size="icon" variant="ghost" onClick={handleLogout} className="w-full" title="Logout">
+              <LogOut className="h-4 w-4" />
             </Button>
-          </div>
+          )
         ) : (
           <div className="flex items-center justify-between gap-2 text-xs">
-            <span className="text-muted-foreground">Not signed in</span>
+            <span className="text-muted-foreground">{open ? 'Not signed in' : '?'}</span>
           </div>
         )}
       </SidebarFooter>

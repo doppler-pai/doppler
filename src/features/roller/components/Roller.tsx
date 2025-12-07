@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { PackType } from '@/shared/models/PackType';
-
+import { Rarity } from '@/shared/models/rarity'
 export interface Skin {
   id: string;
   name: string;
@@ -16,14 +15,14 @@ export interface SkinsData {
 }
 
 interface RollerProps {
-  packType: PackType;
+  Rarity: Rarity;
   onFinish: (skin: Skin) => void;
 }
 
-const PACK_RATES: Record<PackType, { common: number, epic: number, legendary: number }> = {
-  [PackType.COMMON]: { common: 80, epic: 18.5, legendary: 1.5 },
-  [PackType.EPIC]: { common: 5, epic: 85, legendary: 10 },
-  [PackType.LEGENDARY]: { common: 5, epic: 10, legendary: 85 },
+const PACK_RATES: Record<Rarity, { common: number, epic: number, legendary: number }> = {
+  [Rarity.COMMON]: { common: 80, epic: 18.5, legendary: 1.5 },
+  [Rarity.EPIC]: { common: 5, epic: 85, legendary: 10 },
+  [Rarity.LEGENDARY]: { common: 5, epic: 10, legendary: 85 },
 };
 
 const RARITY_COLORS = {
@@ -44,7 +43,7 @@ const RARITY_COLORS = {
   }
 };
 
-export default function Roller({ packType, onFinish }: RollerProps) {
+export default function Roller({ Rarity, onFinish }: RollerProps) {
   const [skins, setSkins] = useState<SkinsData | null>(null);
   const [rolledSkin, setRolledSkin] = useState<Skin | null>(null);
   const [rolledRarity, setRolledRarity] = useState<keyof SkinsData>('common');
@@ -65,7 +64,7 @@ export default function Roller({ packType, onFinish }: RollerProps) {
   useEffect(() => {
     if (!skins) return;
 
-    const rarity = rollRarity(PACK_RATES[packType]);
+    const rarity = rollRarity(PACK_RATES[Rarity]);
     const skin = rollSkin(skins, rarity);
 
     setRolledSkin(skin);
@@ -76,7 +75,7 @@ export default function Roller({ packType, onFinish }: RollerProps) {
         startAnimation(skin);
       }
     }, 150);
-  }, [skins, packType]);
+  }, [skins, Rarity]);
 
   function rollRarity(rates: Record<string, number>): keyof SkinsData {
     const r = Math.random() * 100;
@@ -196,7 +195,7 @@ export default function Roller({ packType, onFinish }: RollerProps) {
 
         <div className="relative z-10">
           <h1 className="text-center text-white text-3xl font-bold mb-2 tracking-wide">
-            Opening {packType.charAt(0).toUpperCase() + packType.slice(1)} Pack
+            Opening {Rarity.charAt(0).toUpperCase() + Rarity.slice(1)} Pack
           </h1>
           <p className="text-center text-gray-400 text-sm mb-8">Watch carefully...</p>
 

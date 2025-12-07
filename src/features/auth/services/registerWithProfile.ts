@@ -17,6 +17,7 @@ export async function registerWithProfile({ email, password }: RegisterWithProfi
     id: user.uid,
     email: user.email ?? email,
     currency: 0,
+    ownedSkinIds: ['8ojpvUO4j11nocpxqGAX', 'La9PvizwdTqKQJVpcaRm'],
     createdAt: serverTimestamp(),
   };
 
