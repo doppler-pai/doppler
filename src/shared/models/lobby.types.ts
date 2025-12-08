@@ -15,6 +15,7 @@ export type PlayerData = { id?: string; nick?: string; skinId?: string };
 export type QuizMetadata = {
   currentRound: number;
   points: Record<string, number>;
+  answers: Record<string, number>; // playerId -> answerIndex (0-3)
 };
 
 export type LobbyData = {

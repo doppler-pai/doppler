@@ -2,7 +2,7 @@
 
 import { useParams } from 'next/navigation';
 
-import { PlayerRoot } from '@/features/playerFlow/lobby/components/PlayerRoot';
+import { PlayerRoot } from '@/features/playerFlow/PlayerRoot';
 import { ProtectedRoute } from '@/shared/components/auth/ProtectedRoute';
 
 export default function PlayGamePage() {

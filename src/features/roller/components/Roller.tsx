@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Rarity } from '@/shared/models/rarity'
+import { Rarity } from '@/shared/models/rarity';
 export interface Skin {
   id: string;
   name: string;
@@ -19,7 +19,7 @@ interface RollerProps {
   onFinish: (skin: Skin) => void;
 }
 
-const PACK_RATES: Record<Rarity, { common: number, epic: number, legendary: number }> = {
+const PACK_RATES: Record<Rarity, { common: number; epic: number; legendary: number }> = {
   [Rarity.COMMON]: { common: 80, epic: 18.5, legendary: 1.5 },
   [Rarity.EPIC]: { common: 5, epic: 85, legendary: 10 },
   [Rarity.LEGENDARY]: { common: 5, epic: 10, legendary: 85 },
@@ -29,18 +29,18 @@ const RARITY_COLORS = {
   common: {
     border: 'border-gray-400',
     glow: 'shadow-[0_0_15px_rgba(156,163,175,0.4)]',
-    bg: 'bg-gray-400/5'
+    bg: 'bg-gray-400/5',
   },
   epic: {
     border: 'border-purple-500',
     glow: 'shadow-[0_0_20px_rgba(168,85,247,0.5)]',
-    bg: 'bg-purple-500/5'
+    bg: 'bg-purple-500/5',
   },
   legendary: {
     border: 'border-yellow-400',
     glow: 'shadow-[0_0_25px_rgba(250,204,21,0.6)]',
-    bg: 'bg-yellow-400/5'
-  }
+    bg: 'bg-yellow-400/5',
+  },
 };
 
 export default function Roller({ Rarity, onFinish }: RollerProps) {
@@ -97,8 +97,8 @@ export default function Roller({ Rarity, onFinish }: RollerProps) {
 
   function getRarityForSkin(skin: Skin): keyof SkinsData {
     if (!skins) return 'common';
-    if (skins.common.some(s => s.id === skin.id)) return 'common';
-    if (skins.epic.some(s => s.id === skin.id)) return 'epic';
+    if (skins.common.some((s) => s.id === skin.id)) return 'common';
+    if (skins.epic.some((s) => s.id === skin.id)) return 'epic';
     return 'legendary';
   }
 
@@ -107,7 +107,7 @@ export default function Roller({ Rarity, onFinish }: RollerProps) {
 
     const STRIP = [];
 
-    const prePadding = 100;  
+    const prePadding = 100;
     const postPadding = 100;
 
     for (let i = 0; i < prePadding; i++) STRIP.push(all[Math.floor(Math.random() * all.length)]);
@@ -132,8 +132,7 @@ export default function Roller({ Rarity, onFinish }: RollerProps) {
 
     const containerCenter = container.parentElement!.offsetWidth / 2;
 
-    const stopOffset =
-      -(targetIndex * itemWidth - containerCenter + itemWidth / 2);
+    const stopOffset = -(targetIndex * itemWidth - containerCenter + itemWidth / 2);
 
     container.style.transition = 'transform 4.5s cubic-bezier(.05,.8,.1,1)';
     container.style.transform = `translateX(${stopOffset}px)`;
@@ -156,26 +155,24 @@ export default function Roller({ Rarity, onFinish }: RollerProps) {
 
     return (
       <div className="fixed inset-0 z-[9999] bg-gradient-to-br from-black via-gray-900 to-black flex items-center justify-center backdrop-blur-md">
-        <div className={`relative p-12 rounded-3xl border-4 ${colors.border} ${colors.glow} bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 max-w-2xl`}>
+        <div
+          className={`relative p-12 rounded-3xl border-4 ${colors.border} ${colors.glow} bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 max-w-2xl`}
+        >
           <div className="absolute -top-6 left-1/2 -translate-x-1/2">
             <div className={`px-8 py-2 rounded-full border-2 ${colors.border} ${colors.bg} backdrop-blur-sm`}>
-              <span className="text-white font-bold text-lg uppercase tracking-wider">
-                {rolledRarity}
-              </span>
+              <span className="text-white font-bold text-lg uppercase tracking-wider">{rolledRarity}</span>
             </div>
           </div>
 
-          <h1 className="text-white text-4xl text-center mb-8 mt-4 font-bold tracking-wide">
-            You Got:
-          </h1>
+          <h1 className="text-white text-4xl text-center mb-8 mt-4 font-bold tracking-wide">You Got:</h1>
 
-          <div className={`w-64 h-64 mx-auto border-4 ${colors.border} ${colors.glow} rounded-2xl flex items-center justify-center ${colors.bg} p-4`}>
+          <div
+            className={`w-64 h-64 mx-auto border-4 ${colors.border} ${colors.glow} rounded-2xl flex items-center justify-center ${colors.bg} p-4`}
+          >
             <img src={rolledSkin.image} className="w-full h-full object-contain drop-shadow-2xl" />
           </div>
 
-          <h2 className="text-white text-center text-3xl mt-8 font-bold">
-            {rolledSkin.name}
-          </h2>
+          <h2 className="text-white text-center text-3xl mt-8 font-bold">{rolledSkin.name}</h2>
 
           <button
             onClick={() => onFinish(rolledSkin)}

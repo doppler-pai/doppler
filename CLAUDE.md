@@ -25,6 +25,7 @@ Next.js 16 App Router application with Firebase backend (Firestore + Realtime Da
 ### Feature Module Pattern
 
 Features under `src/features/<featureName>/` contain:
+
 - `components/` - React components
 - `services/` - Business logic and Firebase operations (one file per operation)
 - `models/` - TypeScript types
@@ -43,6 +44,7 @@ Key features: `hostFlow/`, `playerFlow/`, `auth/`, `sets/`, `market/`
 - Use **async server components** for SSR data fetching.
 
 **When to use client components (`"use client"`):**
+
 - Browser APIs (`window`, `document`, `localStorage`, etc.)
 - Client-only React hooks (`useState`, `useEffect`, `useRef`, `useContext` for client state)
 - Direct DOM manipulation or event handlers (forms, buttons, drag & drop)
@@ -67,16 +69,19 @@ Put `"use client"` at the top of the file and keep these components as small and
 **Location:** `src/features/<featureName>/services/` with one file per operation (e.g. `getProducts.ts`, `addProduct.ts`).
 
 **Contracts:**
+
 - Input/output shapes must be defined in `models/` and imported into services.
 - No raw `any` for service output; always type results with proper models.
 
 **Environment:**
+
 - Services are environment-aware but UI-agnostic.
 - They can call Firestore, HTTP APIs, or other infra from `shared/lib`.
 - They must **not** import React or deal with JSX/HTML.
 - Services must be safe to call from server components, API routes, server actions, or occasionally client components.
 
 **Error handling:**
+
 - Return structured results: `{ success: true, data: ... }` or `{ success: false, error: string }`.
 - Log unexpected errors inside the service and return a safe error message.
 

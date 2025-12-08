@@ -1,18 +1,17 @@
 {
-    "common": [
-      { "id": "goblin", "name": "Goblin", "image": "/skins/clashRoyale/common/Gobs.png" },
-      { "id": "bomber", "name": "Bomber", "image": "/skins/clashRoyale/common/Bomber.png" },
-      { "id": "skeleton", "name": "Skeleton", "image": "/skins/clashRoyale/common/Skeleton.png" }
-    ],
-    "epic": [
-      { "id": "bandit", "name": "Bandit", "image": "/skins/clashRoyale/epic/Bandit.png" },
-      { "id": "golem", "name": "Golem", "image": "/skins/clashRoyale/epic/Golem.png" },
-      { "id": "witch", "name": "Witch", "image": "/skins/clashRoyale/epic/witch.png" },
-      { "id": "wizard", "name": "Wizard", "image": "/skins/clashRoyale/epic/wizard.png" }
-    ],
-    "legendary": [
-      { "id": "hogs", "name": "Hogs", "image": "/skins/clashRoyale/legendary/hogs.png" },
-      { "id": "lumberjack", "name": "Lumberjack", "image": "/skins/clashRoyale/legendary/lumberjack.png" }
-    ]
-  }
-  
+  "common": [
+    { "id": "goblin", "name": "Goblin", "image": "/skins/clashRoyale/common/Gobs.png" },
+    { "id": "bomber", "name": "Bomber", "image": "/skins/clashRoyale/common/Bomber.png" },
+    { "id": "skeleton", "name": "Skeleton", "image": "/skins/clashRoyale/common/Skeleton.png" }
+  ],
+  "epic": [
+    { "id": "bandit", "name": "Bandit", "image": "/skins/clashRoyale/epic/Bandit.png" },
+    { "id": "golem", "name": "Golem", "image": "/skins/clashRoyale/epic/Golem.png" },
+    { "id": "witch", "name": "Witch", "image": "/skins/clashRoyale/epic/witch.png" },
+    { "id": "wizard", "name": "Wizard", "image": "/skins/clashRoyale/epic/wizard.png" }
+  ],
+  "legendary": [
+    { "id": "hogs", "name": "Hogs", "image": "/skins/clashRoyale/legendary/hogs.png" },
+    { "id": "lumberjack", "name": "Lumberjack", "image": "/skins/clashRoyale/legendary/lumberjack.png" }
+  ]
+}

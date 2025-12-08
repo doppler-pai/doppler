@@ -8,12 +8,14 @@ import { useParticleSystem } from '../hooks/useParticleSystem';
 import { startGame } from '../services/startGame';
 import { User } from 'lucide-react';
 import { PlayerCard } from '@/shared/components/player/PlayerCard';
+import { GameModeType } from '@/shared/models/lobby.types';
 
 interface HostProps {
   gameId: string;
+  gameType: GameModeType;
 }
 
-export function Host({ gameId }: HostProps) {
+export function Host({ gameId, gameType }: HostProps) {
   const { players, loading } = useGamePlayers(gameId);
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -30,7 +32,7 @@ export function Host({ gameId }: HostProps) {
   });
 
   const handlePlay = () => {
-    startGame(gameId);
+    startGame(gameId, gameType);
   };
 
   return (

@@ -5,7 +5,7 @@ import { GameProgressBar } from './GameProgressBar';
 import { GameHeader } from './GameHeader';
 import { Leaderboard } from './Leaderboard';
 
-type GameLayoutProps = {
+type HostGameLayoutProps = {
   progress: number;
   primaryHeaderText: string;
   secondaryHeaderText: string;
@@ -13,13 +13,13 @@ type GameLayoutProps = {
   children: React.ReactNode;
 };
 
-export function GameLayout({
+export function HostGameLayout({
   progress,
   primaryHeaderText,
   secondaryHeaderText,
   leaderboardEntries,
   children,
-}: GameLayoutProps) {
+}: HostGameLayoutProps) {
   return (
     <div className="h-screen w-full flex bg-dark">
       <GameProgressBar progress={progress} />

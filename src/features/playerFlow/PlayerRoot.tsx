@@ -1,8 +1,9 @@
 'use client';
 
-import { Lobby } from './Lobby';
+import { Lobby } from './lobby/components/Lobby';
 import { useLobbyState } from '@/shared/hooks/useLobbyState';
 import { LobbyStatus } from '@/shared/models/lobby.types';
+import { GameRoot } from './game/components/GameRoot';
 
 type Status = 'checking' | 'not-found' | LobbyStatus.QUEUED | LobbyStatus.IN_PROGRESS | LobbyStatus.COMPLETED;
 
@@ -35,12 +36,8 @@ export function PlayerRoot({ gameId }: PlayerRootProps) {
     return <Lobby gameId={gameId} />;
   }
 
-  if (status === LobbyStatus.IN_PROGRESS) {
-    return (
-      <div className="flex min-h-[70vh] w-full items-center justify-center px-4">
-        <p>Game is in progress.</p>
-      </div>
-    );
+  if (status === LobbyStatus.IN_PROGRESS && lobbyState) {
+    return <GameRoot gameId={gameId} gameType={lobbyState.gameType} />;
   }
 
   if (status === LobbyStatus.COMPLETED) {

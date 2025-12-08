@@ -47,8 +47,8 @@ export function HostRoot({ gameId }: HostRootProps) {
     );
   }
 
-  if (status === LobbyStatus.QUEUED) {
-    return <Host gameId={gameId} />;
+  if (status === LobbyStatus.QUEUED && lobbyState) {
+    return <Host gameId={gameId} gameType={lobbyState.gameType} />;
   }
 
   if (status === LobbyStatus.IN_PROGRESS) {
