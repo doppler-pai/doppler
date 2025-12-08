@@ -41,7 +41,7 @@ const links = [
   },
   {
     title: 'Create New Set',
-    url: '#',
+    url: 'sets/create',
     icon: PlusSquare,
   },
 ];
