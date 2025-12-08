@@ -1,114 +1,155 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
-import Image from 'next/image';
-import { Rarity, RARITY_RATES, RARITY_REFUND } from '@/shared/models/rarity';
-import type { SkinWithOwnership } from '@/features/playerFlow/lobby/models/skin.types';
+import { useEffect, useRef, useState } from 'react';
+import { Rarity } from '@/shared/models/rarity';
+
+export interface Skin {
+  id: string;
+  name: string;
+  image: string;
+  rarity?: Rarity;
+}
 
 export type RollResult = {
-  skin: SkinWithOwnership;
+  skin: Skin;
   isDuplicate: boolean;
   refund: number;
 };
 
-type RollerProps = {
+interface RollerProps {
   rarity: Rarity;
-  skins: SkinWithOwnership[];
+  skins: Skin[];
   onFinish: (result: RollResult) => void;
+}
+
+const PACK_RATES: Record<Rarity, { common: number; epic: number; legendary: number }> = {
+  [Rarity.COMMON]: { common: 80, epic: 18.5, legendary: 1.5 },
+  [Rarity.EPIC]: { common: 5, epic: 85, legendary: 10 },
+  [Rarity.LEGENDARY]: { common: 5, epic: 10, legendary: 85 },
+};
+
+const RARITY_COLORS = {
+  common: 'border-gray-400',
+  epic: 'border-purple-500',
+  legendary: 'border-yellow-400',
 };
 
 export default function Roller({ rarity, skins, onFinish }: RollerProps) {
+  const [rolledSkin, setRolledSkin] = useState<Skin | null>(null);
+  const [showResult, setShowResult] = useState(false);
+
   const containerRef = useRef<HTMLDivElement>(null);
-  const hasRolled = useRef(false);
-
-  const rollRarity = useCallback((): Rarity => {
-    const rates = RARITY_RATES[rarity];
-    const r = Math.random() * 100;
-    let sum = 0;
-
-    for (const [rarityKey, rate] of Object.entries(rates)) {
-      sum += rate;
-      if (r <= sum) {
-        return rarityKey as Rarity;
-      }
-    }
-    return Rarity.COMMON;
-  }, [rarity]);
-
-  const rollSkin = useCallback(
-    (targetRarity: Rarity): SkinWithOwnership => {
-      const skinsOfRarity = skins.filter((s) => s.rarity === targetRarity);
-      if (skinsOfRarity.length === 0) {
-        // Fallback to any skin if no skins of that rarity
-        return skins[Math.floor(Math.random() * skins.length)];
-      }
-      return skinsOfRarity[Math.floor(Math.random() * skinsOfRarity.length)];
-    },
-    [skins],
-  );
-
-  const runAnimation = useCallback(
-    (target: SkinWithOwnership) => {
-      const container = containerRef.current;
-      if (!container) return;
-
-      const itemWidth = 120;
-      const repeat = 30;
-
-      const targetIndex = repeat * skins.length + skins.findIndex((s) => s.id === target.id);
-      const stopOffset = -(targetIndex * itemWidth) + 300;
-
-      container.style.transition = 'transform 5s cubic-bezier(0.1, 0.9, 0.2, 1)';
-      container.style.transform = `translateX(${stopOffset}px)`;
-
-      const isDuplicate = target.isOwned === true;
-      const skinRarity = target.rarity.toLowerCase() as Rarity;
-      const refund = isDuplicate ? (RARITY_REFUND[skinRarity] ?? 0) : 0;
-
-      setTimeout(() => onFinish({ skin: target, isDuplicate, refund }), 5000);
-    },
-    [skins, onFinish],
-  );
+  const itemRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (hasRolled.current || skins.length === 0) return;
-    hasRolled.current = true;
+    if (!skins.length) return;
 
-    const rolledRarity = rollRarity();
-    const skin = rollSkin(rolledRarity);
-    runAnimation(skin);
-  }, [skins, rollRarity, rollSkin, runAnimation]);
+    const skin = rollSkin(skins);
+    setRolledSkin(skin);
 
-  if (skins.length === 0) {
-    return <p className="text-center">No skins available</p>;
+    setTimeout(() => {
+      if (containerRef.current && itemRef.current) {
+        startAnimation();
+      }
+    }, 150);
+  }, [skins]);
+
+  function rollSkin(list: Skin[]): Skin {
+    return list[Math.floor(Math.random() * list.length)];
   }
 
-  console.log(skins);
+  function buildStrip(target: Skin) {
+    const STRIP = [];
+    const prePadding = 100;
+    const postPadding = 100;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-      <div className="bg-[#111] rounded-xl p-8 shadow-2xl border border-white/10 w-[80%] max-w-4xl">
-        <h1 className="text-center text-white text-2xl mb-6">Rolling {rarity.toUpperCase()} Pack...</h1>
+    for (let i = 0; i < prePadding; i++) STRIP.push(skins[Math.floor(Math.random() * skins.length)]);
+    STRIP.push(target);
+    for (let i = 0; i < postPadding; i++) STRIP.push(skins[Math.floor(Math.random() * skins.length)]);
 
-        <div className="relative w-full h-40 bg-black/60 overflow-hidden border rounded-lg mx-auto">
-          <div ref={containerRef} className="flex gap-4 py-6" style={{ transform: 'translateX(0px)' }}>
-            {Array(80)
-              .fill(0)
-              .flatMap((_, i) =>
-                skins.map((skin) => (
-                  <Image
-                    key={`${skin.id}-${i}`}
-                    src={skin.image}
-                    alt={skin.name}
-                    width={112}
-                    height={112}
-                    className="object-contain rounded-md"
-                  />
-                )),
-              )}
+    return STRIP;
+  }
+
+  const strip = rolledSkin ? buildStrip(rolledSkin) : [];
+
+  function startAnimation() {
+    const container = containerRef.current;
+    const item = itemRef.current;
+    if (!container || !item) return;
+
+    const itemWidth = item.getBoundingClientRect().width;
+    const targetIndex = 100;
+    const containerCenter = container.parentElement!.offsetWidth / 2;
+    const stopOffset = -(targetIndex * itemWidth - containerCenter + itemWidth / 2);
+
+    container.style.transition = 'transform 4.5s cubic-bezier(.05,.8,.1,1)';
+    container.style.transform = `translateX(${stopOffset}px)`;
+
+    setTimeout(() => {
+      setShowResult(true);
+    }, 4600);
+  }
+
+  function handleFinish() {
+    if (!rolledSkin) return;
+
+    // tutaj przyjmujemy, że duplicate sprawdzamy z zewnątrz
+    onFinish({
+      skin: rolledSkin,
+      isDuplicate: false,
+      refund: 0,
+    });
+  }
+
+  if (!skins.length) return <div>Loading...</div>;
+
+  if (showResult && rolledSkin) {
+    const color = RARITY_COLORS[rolledSkin.rarity ?? 'common'];
+
+    return (
+      <div className="fixed inset-0 bg-black/90 flex items-center justify-center">
+        <div className={`p-10 rounded-3xl border-4 ${color} bg-gray-900`}>
+          <h1 className="text-white text-3xl text-center mb-6 font-bold">You got:</h1>
+
+          <div className="w-64 h-64 mx-auto border-4 rounded-xl flex items-center justify-center bg-black">
+            <img src={rolledSkin.image} className="w-full h-full object-contain" />
           </div>
 
-          <div className="absolute left-1/2 top-0 w-[4px] h-full bg-red-500 shadow-[0_0_12px_red]" />
+          <h2 className="text-white text-center text-2xl mt-6 font-bold">{rolledSkin.name}</h2>
+
+          <button
+            onClick={handleFinish}
+            className="block mt-8 mx-auto px-8 py-4 bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-xl"
+          >
+            Continue
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black/80">
+      <div className="w-[80%] max-w-5xl bg-gray-800 p-10 rounded-xl">
+        <h1 className="text-center text-white text-2xl font-bold mb-8">Rolling...</h1>
+
+        <div className="relative w-full h-40 bg-black overflow-hidden rounded-lg border border-white/20">
+          <div ref={containerRef} className="flex items-center">
+            {strip.map((skin, i) => {
+              const color = RARITY_COLORS[skin.rarity ?? 'common'];
+              return (
+                <div
+                  key={i}
+                  ref={i === 0 ? itemRef : null}
+                  className={`flex-shrink-0 w-32 h-32 border-4 ${color} bg-gray-900 flex items-center justify-center`}
+                  style={{ margin: 0, padding: 0 }}
+                >
+                  <img src={skin.image} className="w-full h-full object-contain" />
+                </div>
+              );
+            })}
+          </div>
+          <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-white/70 -translate-x-1/2"></div>
         </div>
       </div>
     </div>

@@ -148,9 +148,15 @@ export default function Market() {
         />
       ))}
 
-      {rollingRarity && (
-        <Roller key={rollKey} rarity={rollingRarity} skins={rollingSkins} onFinish={handleRollFinish} />
-      )}
+{rollingRarity && rollingSkins.length > 0 && (
+  <Roller
+    key={rollKey}
+    rarity={rollingRarity}
+    skins={rollingSkins.map((skin) => ({ ...skin, rarity: skin.rarity as Rarity }))}
+    onFinish={handleRollFinish}
+  />
+)}
+
 
       {rollResult && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
