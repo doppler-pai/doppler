@@ -123,17 +123,19 @@ export default function Market() {
   };
 
   return (
-    <div className="w-full">
-      <div className="w-full h-16 flex items-center px-12 justify-between">
-        <h1 className="mt-10 ml-12">Dopple Market</h1>
-        <div className="flex items-center gap-8 mt-10 mr-12">
-          <Button variant="outline" className="flex items-center gap-1">
+    <div className="min-h-screen w-full pb-20">
+      <div className="w-full max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between px-4 md:px-12 py-8 gap-6">
+        <h1 className="text-3xl md:text-4xl font-bold text-center md:text-left">Dopple Market</h1>
+        <div className="flex flex-wrap items-center justify-center gap-4">
+          <Button variant="outline" className="flex items-center gap-2 min-w-[100px]">
             {coins !== null ? coins : '...'}
             <Image src="/logo/logo.png" alt="coins" width={16} height={16} />
           </Button>
-          <Button variant="outline">Skins owned: {skinsCount !== null ? skinsCount : '...'}</Button>
+          <Button variant="outline" className="min-w-[120px]">
+            Owned: {skinsCount !== null ? skinsCount : '...'}
+          </Button>
           <Link href="/mydopples">
-            <Button>My skin</Button>
+            <Button>My Skins</Button>
           </Link>
         </div>
       </div>
@@ -148,14 +150,14 @@ export default function Market() {
         />
       ))}
 
-{rollingRarity && rollingSkins.length > 0 && (
-  <Roller
-    key={rollKey}
-    rarity={rollingRarity}
-    skins={rollingSkins.map((skin) => ({ ...skin, rarity: skin.rarity as Rarity }))}
-    onFinish={handleRollFinish}
-  />
-)}
+      {rollingRarity && rollingSkins.length > 0 && (
+        <Roller
+          key={rollKey}
+          rarity={rollingRarity}
+          skins={rollingSkins.map((skin) => ({ ...skin, rarity: skin.rarity as Rarity }))}
+          onFinish={handleRollFinish}
+        />
+      )}
 
 
       {rollResult && (

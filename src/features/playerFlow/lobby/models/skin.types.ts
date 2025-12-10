@@ -8,7 +8,7 @@ export type Skin = {
   name: string;
   image: string;
   packId: string;
-  rarity: string;
+  rarity: Rarity;
 };
 
 /**

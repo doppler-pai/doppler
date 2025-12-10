@@ -29,9 +29,18 @@ const PACK_RATES: Record<Rarity, { common: number; epic: number; legendary: numb
 };
 
 const RARITY_COLORS = {
-  common: 'border-gray-400',
-  epic: 'border-purple-500',
-  legendary: 'border-yellow-400',
+  common: {
+    bg: "bg-blue-500",
+    border: "border-blue-500"
+  },
+  epic: {
+    bg: "bg-purple-500",
+    border: "border-purple-500"
+  },
+  legendary: {
+    bg: "bg-yellow-500",
+    border: "border-yellow-500"
+  },
 };
 
 export default function Roller({ rarity, skins, onFinish }: RollerProps) {
@@ -55,6 +64,29 @@ export default function Roller({ rarity, skins, onFinish }: RollerProps) {
   }, [skins]);
 
   function rollSkin(list: Skin[]): Skin {
+    const rates = PACK_RATES[rarity];
+    const roll = Math.random() * 100;
+
+    let targetRarity: Rarity;
+    if (roll < rates.common) {
+      targetRarity = Rarity.COMMON;
+    } else if (roll < rates.common + rates.epic) {
+      targetRarity = Rarity.EPIC;
+    } else {
+      targetRarity = Rarity.LEGENDARY;
+    }
+
+    const candidates = list.filter((s) => {
+      const skinRarity = (s.rarity || 'common').toLowerCase();
+      return skinRarity === targetRarity.toLowerCase();
+    });
+
+    if (candidates.length > 0) {
+      console.log(`[Roller] Pack: ${rarity}, Roll: ${roll.toFixed(2)}, Target: ${targetRarity}, Candidates: ${candidates.length}`);
+      return candidates[Math.floor(Math.random() * candidates.length)];
+    }
+
+    console.warn(`[Roller] No skin found for target ${targetRarity} in pack ${rarity}. Falling back to random.`);
     return list[Math.floor(Math.random() * list.length)];
   }
 
@@ -93,7 +125,6 @@ export default function Roller({ rarity, skins, onFinish }: RollerProps) {
   function handleFinish() {
     if (!rolledSkin) return;
 
-    // tutaj przyjmujemy, że duplicate sprawdzamy z zewnątrz
     onFinish({
       skin: rolledSkin,
       isDuplicate: false,
@@ -133,7 +164,7 @@ export default function Roller({ rarity, skins, onFinish }: RollerProps) {
       <div className="w-[80%] max-w-5xl bg-gray-800 p-10 rounded-xl">
         <h1 className="text-center text-white text-2xl font-bold mb-8">Rolling...</h1>
 
-        <div className="relative w-full h-40 bg-black overflow-hidden rounded-lg border border-white/20">
+        <div className="relative w-full h-40 bg-red overflow-hidden rounded-lg border border-white/20">
           <div ref={containerRef} className="flex items-center">
             {strip.map((skin, i) => {
               const color = RARITY_COLORS[skin.rarity ?? 'common'];
