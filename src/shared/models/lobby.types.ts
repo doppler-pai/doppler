@@ -16,6 +16,9 @@ export type QuizMetadata = {
   currentRound: number;
   points: Record<string, number>;
   answers: Record<string, number>; // playerId -> answerIndex (0-3)
+  showResults?: boolean; // true when displaying correct answer between rounds
+  correctAnswerIndices?: number[]; // indices of all correct answers for current question
+  resultsShownAt?: number; // timestamp when results were shown (for timeout)
 };
 
 export type LobbyData = {
