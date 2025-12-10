@@ -138,7 +138,7 @@ export default function Roller({ rarity, skins, onFinish }: RollerProps) {
     const color = RARITY_COLORS[rolledSkin.rarity ?? 'common'];
 
     return (
-      <div className="fixed inset-0 bg-black/90 flex items-center justify-center">
+      <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50">
         <div className={`p-10 rounded-3xl border-4 ${color} bg-gray-900`}>
           <h1 className="text-white text-3xl text-center mb-6 font-bold">You got:</h1>
 
@@ -160,7 +160,7 @@ export default function Roller({ rarity, skins, onFinish }: RollerProps) {
   }
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/80">
+    <div className="fixed inset-0 flex items-center justify-center bg-black/80 z-50">
       <div className="w-[80%] max-w-5xl bg-gray-800 p-10 rounded-xl">
         <h1 className="text-center text-white text-2xl font-bold mb-8">Rolling...</h1>
 
