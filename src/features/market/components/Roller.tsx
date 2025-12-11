@@ -8,6 +8,7 @@ export interface Skin {
   name: string;
   image: string;
   rarity?: Rarity;
+  isOwned?: boolean;
 }
 
 export type RollResult = {
@@ -19,6 +20,7 @@ export type RollResult = {
 interface RollerProps {
   rarity: Rarity;
   skins: Skin[];
+  prices: Record<string, number>;
   onFinish: (result: RollResult) => void;
 }
 
@@ -30,27 +32,32 @@ const PACK_RATES: Record<Rarity, { common: number; epic: number; legendary: numb
 
 const RARITY_COLORS = {
   common: {
-    bg: "bg-blue-500",
-    border: "border-blue-500"
+    bg: 'bg-blue-500',
+    border: 'border-blue-500',
   },
   epic: {
-    bg: "bg-purple-500",
-    border: "border-purple-500"
+    bg: 'bg-purple-500',
+    border: 'border-purple-500',
   },
   legendary: {
-    bg: "bg-yellow-500",
-    border: "border-yellow-500"
+    bg: 'bg-yellow-500',
+    border: 'border-yellow-500',
   },
 };
 
-export default function Roller({ rarity, skins, onFinish }: RollerProps) {
+export default function Roller({ rarity, skins, prices, onFinish }: RollerProps) {
   const [rolledSkin, setRolledSkin] = useState<Skin | null>(null);
   const [showResult, setShowResult] = useState(false);
+  const hasRolled = useRef(false);
+
 
   const containerRef = useRef<HTMLDivElement>(null);
   const itemRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (hasRolled.current) return;
+    hasRolled.current = true;
+
     if (!skins.length) return;
 
     const skin = rollSkin(skins);
@@ -62,6 +69,7 @@ export default function Roller({ rarity, skins, onFinish }: RollerProps) {
       }
     }, 150);
   }, [skins]);
+
 
   function rollSkin(list: Skin[]): Skin {
     const rates = PACK_RATES[rarity];
@@ -82,27 +90,15 @@ export default function Roller({ rarity, skins, onFinish }: RollerProps) {
     });
 
     if (candidates.length > 0) {
-      console.log(`[Roller] Pack: ${rarity}, Roll: ${roll.toFixed(2)}, Target: ${targetRarity}, Candidates: ${candidates.length}`);
+      console.log(
+        `[Roller] Pack: ${rarity}, Roll: ${roll.toFixed(2)}, Target: ${targetRarity}, Candidates: ${candidates.length}`,
+      );
       return candidates[Math.floor(Math.random() * candidates.length)];
     }
 
     console.warn(`[Roller] No skin found for target ${targetRarity} in pack ${rarity}. Falling back to random.`);
     return list[Math.floor(Math.random() * list.length)];
   }
-
-  function buildStrip(target: Skin) {
-    const STRIP = [];
-    const prePadding = 100;
-    const postPadding = 100;
-
-    for (let i = 0; i < prePadding; i++) STRIP.push(skins[Math.floor(Math.random() * skins.length)]);
-    STRIP.push(target);
-    for (let i = 0; i < postPadding; i++) STRIP.push(skins[Math.floor(Math.random() * skins.length)]);
-
-    return STRIP;
-  }
-
-  const strip = rolledSkin ? buildStrip(rolledSkin) : [];
 
   function startAnimation() {
     const container = containerRef.current;
@@ -122,13 +118,36 @@ export default function Roller({ rarity, skins, onFinish }: RollerProps) {
     }, 4600);
   }
 
+
+
+  function buildStrip(target: Skin) {
+    const STRIP = [];
+    const prePadding = 100;
+    const postPadding = 100;
+
+    for (let i = 0; i < prePadding; i++) STRIP.push(skins[Math.floor(Math.random() * skins.length)]);
+    STRIP.push(target);
+    for (let i = 0; i < postPadding; i++) STRIP.push(skins[Math.floor(Math.random() * skins.length)]);
+
+    return STRIP;
+  }
+
+  const strip = rolledSkin ? buildStrip(rolledSkin) : [];
+
   function handleFinish() {
     if (!rolledSkin) return;
 
+    const isDuplicate = !!rolledSkin.isOwned;
+    // Calculate refund: 50% of the pack price for this rarity
+    // Default to 0 if price not found
+    const skinRarity = (rolledSkin.rarity || 'common').toLowerCase();
+    const basePrice = prices[skinRarity] || 0;
+    const refund = isDuplicate ? Math.floor(basePrice * 0.5) : 0;
+
     onFinish({
       skin: rolledSkin,
-      isDuplicate: false,
-      refund: 0,
+      isDuplicate,
+      refund,
     });
   }
 

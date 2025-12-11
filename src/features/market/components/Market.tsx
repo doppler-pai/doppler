@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { auth, db } from '@/shared/lib/firebase';
@@ -58,6 +58,17 @@ export default function Market() {
       if (unsubscribeSnapshot) unsubscribeSnapshot();
     };
   }, []);
+
+  // Calculate prices map for Roller to use in refunds
+  const rarityPrices = useMemo(() => {
+    const prices: Record<string, number> = {};
+    packs.forEach((pack) => {
+      Object.entries(pack.rarities).forEach(([rarity, config]) => {
+        prices[rarity.toLowerCase()] = config.price;
+      });
+    });
+    return prices;
+  }, [packs]);
 
   const handleBuy = async (packId: string, rarity: Rarity, price: number) => {
     const user = auth.currentUser;
@@ -155,10 +166,10 @@ export default function Market() {
           key={rollKey}
           rarity={rollingRarity}
           skins={rollingSkins.map((skin) => ({ ...skin, rarity: skin.rarity as Rarity }))}
+          prices={rarityPrices}
           onFinish={handleRollFinish}
         />
       )}
-
 
       {rollResult && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
