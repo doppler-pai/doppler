@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { Rarity } from '@/shared/models/rarity';
 
 export interface Skin {
@@ -47,9 +47,7 @@ const RARITY_COLORS = {
 
 export default function Roller({ rarity, skins, prices, onFinish }: RollerProps) {
   const [rolledSkin, setRolledSkin] = useState<Skin | null>(null);
-  const [showResult, setShowResult] = useState(false);
   const hasRolled = useRef(false);
-
 
   const containerRef = useRef<HTMLDivElement>(null);
   const itemRef = useRef<HTMLDivElement>(null);
@@ -65,7 +63,7 @@ export default function Roller({ rarity, skins, prices, onFinish }: RollerProps)
 
     setTimeout(() => {
       if (containerRef.current && itemRef.current) {
-        startAnimation();
+        startAnimation(skin);
       }
     }, 150);
   }, [skins]);
@@ -100,7 +98,7 @@ export default function Roller({ rarity, skins, prices, onFinish }: RollerProps)
     return list[Math.floor(Math.random() * list.length)];
   }
 
-  function startAnimation() {
+  function startAnimation(skin: Skin) {
     const container = containerRef.current;
     const item = itemRef.current;
     if (!container || !item) return;
@@ -114,7 +112,7 @@ export default function Roller({ rarity, skins, prices, onFinish }: RollerProps)
     container.style.transform = `translateX(${stopOffset}px)`;
 
     setTimeout(() => {
-      setShowResult(true);
+      handleFinish(skin);
     }, 4600);
   }
 
@@ -132,51 +130,26 @@ export default function Roller({ rarity, skins, prices, onFinish }: RollerProps)
     return STRIP;
   }
 
-  const strip = rolledSkin ? buildStrip(rolledSkin) : [];
+  const strip = useMemo(() => {
+    return rolledSkin ? buildStrip(rolledSkin) : [];
+  }, [rolledSkin]);
 
-  function handleFinish() {
-    if (!rolledSkin) return;
+  function handleFinish(skin: Skin) {
+    if (!skin) return;
 
-    const isDuplicate = !!rolledSkin.isOwned;
-    // Calculate refund: 50% of the pack price for this rarity
-    // Default to 0 if price not found
-    const skinRarity = (rolledSkin.rarity || 'common').toLowerCase();
+    const isDuplicate = !!skin.isOwned;
+    const skinRarity = (skin.rarity || 'common').toLowerCase();
     const basePrice = prices[skinRarity] || 0;
     const refund = isDuplicate ? Math.floor(basePrice * 0.5) : 0;
 
     onFinish({
-      skin: rolledSkin,
+      skin: skin,
       isDuplicate,
       refund,
     });
   }
 
   if (!skins.length) return <div>Loading...</div>;
-
-  if (showResult && rolledSkin) {
-    const color = RARITY_COLORS[rolledSkin.rarity ?? 'common'];
-
-    return (
-      <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50">
-        <div className={`p-10 rounded-3xl border-4 ${color} bg-gray-900`}>
-          <h1 className="text-white text-3xl text-center mb-6 font-bold">You got:</h1>
-
-          <div className="w-64 h-64 mx-auto border-4 rounded-xl flex items-center justify-center bg-black">
-            <img src={rolledSkin.image} className="w-full h-full object-contain" />
-          </div>
-
-          <h2 className="text-white text-center text-2xl mt-6 font-bold">{rolledSkin.name}</h2>
-
-          <button
-            onClick={handleFinish}
-            className="block mt-8 mx-auto px-8 py-4 bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-xl"
-          >
-            Continue
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/80 z-50">
