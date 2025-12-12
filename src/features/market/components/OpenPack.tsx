@@ -36,7 +36,7 @@ export default function OpenPack({ rarity, skins, onFinish }: OpenPackProps) {
         </button>
       )}
 
-      {isRolling && <Roller rarity={rarity} skins={skins} onFinish={handleFinish} />}
+      {isRolling && <Roller rarity={rarity} skins={skins} prices={{}} onFinish={handleFinish} />}
 
       {result && (
         <div className="mt-4 text-center">
