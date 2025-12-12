@@ -32,16 +32,16 @@ const PACK_RATES: Record<Rarity, { common: number; epic: number; legendary: numb
 
 const RARITY_COLORS = {
   common: {
-    bg: 'bg-blue-500',
+    bg: 'bg-gradient-to-br from-blue-600 to-blue-900',
     border: 'border-blue-500',
   },
   epic: {
-    bg: 'bg-purple-500',
+    bg: 'bg-gradient-to-br from-purple-600 to-indigo-900',
     border: 'border-purple-500',
   },
   legendary: {
-    bg: 'bg-yellow-500',
-    border: 'border-yellow-500',
+    bg: 'bg-gradient-to-br from-amber-400 via-orange-500 to-yellow-600',
+    border: 'border-yellow-400',
   },
 };
 
@@ -159,12 +159,13 @@ export default function Roller({ rarity, skins, prices, onFinish }: RollerProps)
         <div className="relative w-full h-40 bg-red overflow-hidden rounded-lg border border-white/20">
           <div ref={containerRef} className="flex items-center">
             {strip.map((skin, i) => {
-              const color = RARITY_COLORS[skin.rarity ?? 'common'];
+              const rarityKey = (skin.rarity || 'common').toLowerCase() as keyof typeof RARITY_COLORS;
+              const color = RARITY_COLORS[rarityKey];
               return (
                 <div
                   key={i}
                   ref={i === 0 ? itemRef : null}
-                  className={`flex-shrink-0 w-32 h-32 border-4 ${color} bg-gray-900 flex items-center justify-center`}
+                  className={`flex-shrink-0 w-32 h-32 border-4 ${color.border} ${color.bg} flex items-center justify-center`}
                   style={{ margin: 0, padding: 0 }}
                 >
                   <img src={skin.image} className="w-full h-full object-contain" />

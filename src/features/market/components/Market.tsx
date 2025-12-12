@@ -45,7 +45,6 @@ export default function Market() {
         }
       });
 
-      // Fetch packs
       getSkinData(user.uid).then((result) => {
         if (result) {
           setPacks(result);
@@ -59,7 +58,6 @@ export default function Market() {
     };
   }, []);
 
-  // Calculate prices map for Roller to use in refunds
   const rarityPrices = useMemo(() => {
     const prices: Record<string, number> = {};
     packs.forEach((pack) => {
@@ -105,17 +103,14 @@ export default function Market() {
     const ref = doc(db, 'users', user.uid);
 
     if (isDuplicate) {
-      // Refund currency for duplicate
       await updateDoc(ref, {
         currency: increment(refund),
       });
     } else {
-      // Add skin to owned skins in Firestore
       await updateDoc(ref, {
         ownedSkinIds: arrayUnion(skin.id),
       });
 
-      // Update local state to mark skin as owned (for future rolls in same session)
       setPacks((prevPacks) =>
         prevPacks.map((pack) => ({
           ...pack,
