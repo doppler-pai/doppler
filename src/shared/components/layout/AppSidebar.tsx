@@ -21,7 +21,7 @@ import { useRouter } from 'next/navigation';
 const links = [
   {
     title: 'Play Now',
-    url: 'play',
+    url: '/play',
     icon: Gamepad2,
   },
   {
@@ -31,7 +31,7 @@ const links = [
   },
   {
     title: 'Dopple Market',
-    url: 'market',
+    url: '/market',
     icon: Store,
   },
   {
@@ -41,7 +41,7 @@ const links = [
   },
   {
     title: 'Create New Set',
-    url: '#',
+    url: 'sets/create',
     icon: PlusSquare,
   },
 ];
@@ -73,7 +73,7 @@ export function AppSidebar() {
           <SidebarMenu>
             {links.map((link) => (
               <SidebarMenuItem key={link.title}>
-                <SidebarMenuButton onClick={() => router.push(link.url)}>
+                <SidebarMenuButton onClick={() => router.replace(link.url)}>
                   <link.icon />
                   <span>{link.title}</span>
                 </SidebarMenuButton>

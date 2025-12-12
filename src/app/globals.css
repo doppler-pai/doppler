@@ -52,6 +52,11 @@
   --color-gold: #bd8100;
   --color-silver: #6a6a6a;
   --color-bronze: #562a0c;
+
+  --color-answer-orange: var(--color-orange-400);
+  --color-answer-purple: var(--color-purple-400);
+  --color-answer-green: var(--color-green-400);
+  --color-answer-blue: var(--color-blue-400);
 }
 
 :root {
@@ -110,6 +115,14 @@
   --color-orange-500: #ff8500;
   --color-orange-400: #ff9e00;
   --color-orange-300: #ffcd7d;
+
+  --color-green-500: #22c55e;
+  --color-green-400: #4ade80;
+  --color-green-300: #86efac;
+
+  --color-blue-500: #3b82f6;
+  --color-blue-400: #60a5fa;
+  --color-blue-300: #93c5fd;
 }
 
 @layer base {

@@ -11,12 +11,7 @@ interface UsePlayerPhysicsOptions {
   onFrame?: (players: PlayerPhysics[]) => void;
 }
 
-export function usePlayerPhysics({
-  players,
-  containerRef,
-  cardRefs,
-  onFrame,
-}: UsePlayerPhysicsOptions): {
+export function usePlayerPhysics({ players, containerRef, cardRefs, onFrame }: UsePlayerPhysicsOptions): {
   playerPositions: PlayerPhysics[];
   boostAll: () => void;
   boostPlayer: (playerId: string) => void;

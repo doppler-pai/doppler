@@ -3,15 +3,17 @@
 import { Pen, Trash2, Forward, Play } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface SetCardProps {
+  id: string;
   title: string;
   plays: number;
   edited: number;
   questions: number;
 }
 
-export const SetCard = ({ title, plays, edited, questions }: SetCardProps) => {
+export const SetCard = ({ id, title, plays, edited, questions }: SetCardProps) => {
   return (
     <div className="m-10 w-70 rounded-md" id="SetCard">
       <div className="relative">
@@ -24,7 +26,9 @@ export const SetCard = ({ title, plays, edited, questions }: SetCardProps) => {
         <h2 className="pt-2 mb-5">{title}</h2>
         {<h3 className="">{plays} plays</h3>} <small className="">edited {edited} minutes ago</small>
         <div className="mt-2 mx-5 flex flex-row justify-between">
-          <Pen className="text-text" />
+          <Link href={`/sets/edit/${id}`}>
+            <Pen className="text-text cursor-pointer hover:text-primary transition-colors" />
+          </Link>
           <Trash2 className="text-text" />
           <Forward className="text-text" />
         </div>
