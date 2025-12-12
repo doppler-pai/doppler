@@ -7,27 +7,102 @@ import { Textarea } from '@/shared/components/ui/textarea';
 import { Switch } from '@/shared/components/ui/switch';
 import { Button } from '@/shared/components/ui/button';
 import { QuestionCard } from './QuestionCard';
+import { SetData, Question, QuestionType } from '@/shared/models/sets.type';
 
-export const SetForm = () => {
-  const [isPublic, setIsPublic] = useState(false);
-  const [questions, setQuestions] = useState([{ id: '1' }]);
-  const [activeQuestionId, setActiveQuestionId] = useState<string | null>('1');
+interface SetFormProps {
+  initialData?: SetData;
+  onSubmit: (data: Omit<SetData, 'id'> | SetData) => Promise<void>;
+  isLoading?: boolean;
+}
 
-  const handleAddQuestion = (currentId: string) => {
-    const currentIndex = questions.findIndex((q) => q.id === currentId);
-    const newQuestion = { id: crypto.randomUUID() };
+const DEFAULT_QUESTION: Question = {
+  type: QuestionType.FOUR_OPTIONS,
+  metadata: {
+    question: '',
+    answers: [
+      { answer: '', isCorrect: false },
+      { answer: '', isCorrect: false },
+      { answer: '', isCorrect: false },
+      { answer: '', isCorrect: false },
+    ],
+  },
+};
+
+export const SetForm = ({ initialData, onSubmit, isLoading }: SetFormProps) => {
+  const [title, setTitle] = useState(initialData?.title || '');
+  const [description, setDescription] = useState(initialData?.description || '');
+  const [isPublic, setIsPublic] = useState(initialData?.isPublic || false);
+  const [questions, setQuestions] = useState<Question[]>(initialData?.questions || [DEFAULT_QUESTION]);
+
+  const [errors, setErrors] = useState<{ title?: string; description?: string; questions?: string }>({});
+
+  // State syncing is handled by the parent component (EditSet) using the `key` prop to force re-mounting when data changes.
+
+  // Use index as ID for selection for simplicity in this session.
+  const [activeQuestionIndex, setActiveQuestionIndex] = useState<number | null>(0);
+
+  const handleAddQuestion = (index: number) => {
+    // insert after index
+    const newQuestion = JSON.parse(JSON.stringify(DEFAULT_QUESTION)); // Deep copy
     const newQuestions = [...questions];
-    newQuestions.splice(currentIndex + 1, 0, newQuestion);
+    newQuestions.splice(index + 1, 0, newQuestion);
     setQuestions(newQuestions);
-    setActiveQuestionId(newQuestion.id);
+    setActiveQuestionIndex(index + 1);
   };
 
-  const handleDeleteQuestion = (id: string) => {
+  const handleDeleteQuestion = (indexStr: string) => {
+    const index = parseInt(indexStr);
     if (questions.length === 1) return;
-    const newQuestions = questions.filter((q) => q.id !== id);
+    const newQuestions = questions.filter((_, i) => i !== index);
     setQuestions(newQuestions);
-    if (activeQuestionId === id) {
-      setActiveQuestionId(null);
+    if (activeQuestionIndex === index) {
+      setActiveQuestionIndex(null);
+    } else if (activeQuestionIndex !== null && activeQuestionIndex > index) {
+      setActiveQuestionIndex(activeQuestionIndex - 1);
+    }
+  };
+
+  const handleQuestionChange = (index: number, updatedQuestion: Question) => {
+    const newQuestions = [...questions];
+    newQuestions[index] = updatedQuestion;
+    setQuestions(newQuestions);
+  };
+
+  const validate = (): boolean => {
+    const newErrors: { title?: string; description?: string; questions?: string } = {};
+    let isValid = true;
+
+    if (!title.trim()) {
+      newErrors.title = 'Title is required';
+      isValid = false;
+    }
+    if (!description.trim()) {
+      newErrors.description = 'Description is required';
+      isValid = false;
+    }
+    if (questions.length === 0) {
+      newErrors.questions = 'At least one question is required';
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  const handleSubmit = async () => {
+    if (!validate()) return;
+
+    const data: Omit<SetData, 'id'> = {
+      title,
+      description,
+      isPublic,
+      ownerId: initialData?.ownerId || 'current-user-id', // TODO: Get actual user ID
+      questions,
+    };
+    if (initialData?.id) {
+      await onSubmit({ ...data, id: initialData.id });
+    } else {
+      await onSubmit(data);
     }
   };
 
@@ -39,8 +114,25 @@ export const SetForm = () => {
             <Image src="/sets/setCover2.png" alt="cover" width={500} height={500} className="w-full" />
           </div>
           <div className="w-[70%] flex flex-col justify-between">
-            <Input placeholder="Title" />
-            <Textarea placeholder="Description" className="h-20 max-w-full" />
+            <div className="flex flex-col gap-1">
+              <Input
+                placeholder="Title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className={errors.title ? 'border-red-500' : ''}
+              />
+              {errors.title && <small className="text-red-500">{errors.title}</small>}
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <Textarea
+                placeholder="Description"
+                className={`h-20 max-w-full ${errors.description ? 'border-red-500' : ''}`}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+              {errors.description && <small className="text-red-500">{errors.description}</small>}
+            </div>
           </div>
         </div>
         <div className="mt-5 flex justify-between">
@@ -48,21 +140,25 @@ export const SetForm = () => {
             <Switch id="public-mode" checked={isPublic} onCheckedChange={setIsPublic} />
             <label htmlFor="public-mode">{isPublic ? 'Public' : 'Private'}</label>
           </div>
-          <div>
-            <Button>Save</Button>
+          <div className="flex flex-col items-end">
+            <Button onClick={handleSubmit} disabled={isLoading}>
+              {isLoading ? 'Saving...' : 'Save'}
+            </Button>
+            {errors.questions && <small className="text-red-500 mt-1">{errors.questions}</small>}
           </div>
         </div>
 
         <div className="mt-10 mb-20 flex flex-col gap-6">
           {questions.map((question, index) => (
             <QuestionCard
-              key={question.id}
-              id={question.id}
+              key={index}
               index={index}
-              isSelected={activeQuestionId === question.id}
-              onSelect={setActiveQuestionId}
-              onAdd={handleAddQuestion}
+              question={question}
+              isSelected={activeQuestionIndex === index}
+              onSelect={() => setActiveQuestionIndex(index)}
+              onAdd={() => handleAddQuestion(index)}
               onDelete={handleDeleteQuestion}
+              onChange={(q) => handleQuestionChange(index, q)}
             />
           ))}
         </div>

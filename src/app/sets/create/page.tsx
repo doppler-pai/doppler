@@ -1,11 +1,11 @@
 import { ProtectedRoute } from '@/shared/components/auth/ProtectedRoute';
-import { SetForm } from '@/features/sets/components/AddSetForm';
+import { CreateSet } from '@/features/sets/components/CreateSet';
 
 export default function AddSet() {
   return (
     <ProtectedRoute>
       <main>
-        <SetForm />
+        <CreateSet />
       </main>
     </ProtectedRoute>
   );
