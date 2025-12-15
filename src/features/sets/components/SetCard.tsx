@@ -17,7 +17,15 @@ export const SetCard = ({ id, title, plays, edited, questions }: SetCardProps) =
   return (
     <div className="m-10 w-70 rounded-md" id="SetCard">
       <div className="relative">
-        <Image src="/sets/setCover.png" alt="cover" width={500} height={500} className="w-full" />
+        <Link href={`/sets/${id}`}>
+          <Image
+            src="/sets/setCover.png"
+            alt="cover"
+            width={500}
+            height={500}
+            className="w-full cursor-pointer hover:opacity-90 transition-opacity"
+          />
+        </Link>
         <div className="absolute bottom-2 right-2 bg-bg-very-dark/70 px-2 py-1 rounded text-text flex justify-center items-center">
           <small>{questions} questions</small>
         </div>

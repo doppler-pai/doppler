@@ -8,6 +8,7 @@ import { Question, FourOptionsMetadata, FourOptionsAnswer } from '@/shared/model
 interface ExtendedQuestionCardProps extends Omit<QuestionCardProps, 'id'> {
   question: Question;
   onChange: (updatedQuestion: Question) => void;
+  readOnly?: boolean;
 }
 
 export function QuestionCard({
@@ -18,6 +19,7 @@ export function QuestionCard({
   onDelete,
   question,
   onChange,
+  readOnly = false,
 }: ExtendedQuestionCardProps) {
   // Ensure we are working with FOUR_OPTIONS for now, based on UI
   const metadata = question.metadata as FourOptionsMetadata;
@@ -71,12 +73,18 @@ export function QuestionCard({
         onClick={() => onSelect(String(index))}
       >
         <div className="mb-4">
-          <Input
-            placeholder={`Question ${index + 1}`}
-            className="mt-2"
-            value={metadata.question}
-            onChange={(e) => handleQuestionChange(e.target.value)}
-          />
+          <div className="mb-4">
+            {readOnly ? (
+              <h3 className="text-lg font-medium mt-2">{metadata.question}</h3>
+            ) : (
+              <Input
+                placeholder={`Question ${index + 1}`}
+                className="mt-2"
+                value={metadata.question}
+                onChange={(e) => handleQuestionChange(e.target.value)}
+              />
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -84,37 +92,50 @@ export function QuestionCard({
             <div
               key={i}
               className={cn(
-                'flex items-center gap-2 rounded-md border bg-bg-very-dark p-3',
-                i === 0
-                  ? 'border-orange-500'
-                  : i === 1
-                    ? 'border-purple-500'
-                    : i === 2
-                      ? 'border-green-500'
-                      : 'border-blue-500',
+                'flex items-center gap-2 rounded-md border p-3',
+                readOnly
+                  ? ans.isCorrect
+                    ? 'bg-purple-500/20 border-purple-500'
+                    : 'bg-bg-very-dark border-transparent'
+                  : cn(
+                      'bg-bg-very-dark',
+                      i === 0
+                        ? 'border-orange-500'
+                        : i === 1
+                          ? 'border-purple-500'
+                          : i === 2
+                            ? 'border-green-500'
+                            : 'border-blue-500',
+                    ),
               )}
             >
-              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-sm bg-background">
-                <input
-                  type="checkbox"
-                  className="w-[80%] h-[80%]"
-                  checked={ans.isCorrect}
-                  onChange={() => handleCorrectChange(i)}
+              {!readOnly && (
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-sm bg-background">
+                  <input
+                    type="checkbox"
+                    className="w-[80%] h-[80%]"
+                    checked={ans.isCorrect}
+                    onChange={() => handleCorrectChange(i)}
+                  />
+                </div>
+              )}
+              {readOnly ? (
+                <div className="w-full px-3 py-2 text-sm">{ans.answer}</div>
+              ) : (
+                <Input
+                  placeholder={`Answer ${i + 1}`}
+                  className="border-none bg-transparent shadow-none focus-visible:ring-0"
+                  value={ans.answer}
+                  onChange={(e) => handleAnswerChange(i, e.target.value)}
                 />
-              </div>
-              <Input
-                placeholder={`Answer ${i + 1}`}
-                className="border-none bg-transparent shadow-none focus-visible:ring-0"
-                value={ans.answer}
-                onChange={(e) => handleAnswerChange(i, e.target.value)}
-              />
+              )}
             </div>
           ))}
         </div>
       </div>
 
-      {/* Side Action Bar - Visible only when selected */}
-      {isSelected && (
+      {/* Side Action Bar - Visible only when selected and not readOnly */}
+      {isSelected && !readOnly && (
         <div className="absolute -right-16 top-0 flex flex-col gap-2">
           <Button
             variant="outline"
