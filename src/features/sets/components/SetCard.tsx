@@ -4,6 +4,15 @@ import { Pen, Trash2, Forward, Play } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/shared/components/ui/dialog';
 import { useState, useRef, useEffect } from 'react';
 
 interface SetCardProps {
@@ -12,11 +21,13 @@ interface SetCardProps {
   plays: number;
   edited: number;
   questions: number;
+  onDelete?: () => void;
 }
 
-export const SetCard = ({ id, title, plays, edited, questions }: SetCardProps) => {
+export const SetCard = ({ id, title, plays, edited, questions, onDelete }: SetCardProps) => {
   const [showMenu, setShowMenu] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -46,6 +57,13 @@ export const SetCard = ({ id, title, plays, edited, questions }: SetCardProps) =
     }
   };
 
+  const handleDeleteConfirm = () => {
+    if (onDelete) {
+      onDelete();
+      setIsDeleteDialogOpen(false);
+    }
+  };
+
   return (
     <div className="m-10 w-70 rounded-md" id="SetCard">
       <div className="relative">
@@ -69,7 +87,37 @@ export const SetCard = ({ id, title, plays, edited, questions }: SetCardProps) =
           <Link href={`/sets/edit/${id}`}>
             <Pen className="text-text cursor-pointer hover:text-primary transition-colors" />
           </Link>
-          <Trash2 className="text-text" />
+
+          <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+            <DialogTrigger asChild>
+              <Trash2 className="text-text cursor-pointer hover:text-red-500 transition-colors" />
+            </DialogTrigger>
+            <DialogContent className="bg-bg-dark border-gray-700 text-text">
+              <DialogHeader>
+                <DialogTitle>Are you sure?</DialogTitle>
+                <DialogDescription className="text-gray-400">
+                  This action cannot be undone. This will permanently delete the set &quot;{title}&quot;.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsDeleteDialogOpen(false)}
+                  className="bg-transparent border-gray-600 hover:bg-gray-800 text-text"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={handleDeleteConfirm}
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                >
+                  Delete
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
           <div className="relative" ref={menuRef}>
             <Forward
               className="text-text cursor-pointer hover:text-primary transition-colors"
