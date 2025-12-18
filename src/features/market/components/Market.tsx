@@ -140,7 +140,7 @@ export default function Market() {
           <Button variant="outline" className="min-w-[120px]">
             Owned: {skinsCount !== null ? skinsCount : '...'}
           </Button>
-          <Link href="/mydopples">
+          <Link href="/dopples">
             <Button>My Skins</Button>
           </Link>
         </div>

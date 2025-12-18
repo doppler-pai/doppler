@@ -24,7 +24,7 @@ export function SkinList({ packs, selectedSkinId, onSelectSkin, readonly = false
     <div className="space-y-8">
       {packs.map((pack) => (
         <div key={pack.packId} className="space-y-3">
-          <h3 className="text-lg font-semibold tracking-tight">{pack.packName}</h3>
+          <h2 className="text-lg font-semibold tracking-tight">{pack.packName}</h2>
 
           <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
             {pack.skins.map((skin) => {
