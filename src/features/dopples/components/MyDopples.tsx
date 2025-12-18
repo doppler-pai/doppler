@@ -18,7 +18,6 @@ export function MyDopples() {
   const [loading, setLoading] = useState(true);
   const [packs, setPacks] = useState<PackWithSkins[]>([]);
 
-  // NEW (snapshot same as Market)
   const [coins, setCoins] = useState<number | null>(null);
   const [skinsCount, setSkinsCount] = useState<number | null>(null);
 
@@ -27,7 +26,6 @@ export function MyDopples() {
 
     const ref = doc(db, 'users', user.uid);
 
-    // snapshot for coins + owned skins
     const unsub = onSnapshot(ref, (snap) => {
       if (!snap.exists()) return;
 
@@ -39,7 +37,6 @@ export function MyDopples() {
     return () => unsub();
   }, [user]);
 
-  // load skins
   useEffect(() => {
     const fetchData = async () => {
       if (!user) return;
@@ -83,10 +80,10 @@ export function MyDopples() {
           </Link>
         </div>
       </div>
-
-      {/* LISTA */}
-      <div className="container mx-auto max-w-5xl pb-8 px-4">
-        <SkinList packs={packs} readonly />
+      <div className="w-full px-4 md:px-52 pb-8">
+        <div className="max-w-5xl">
+          <SkinList packs={packs} readonly />
+        </div>
       </div>
     </div>
   );
