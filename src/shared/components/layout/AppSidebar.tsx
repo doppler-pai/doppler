@@ -26,7 +26,7 @@ const links = [
   },
   {
     title: 'Dopples',
-    url: '#',
+    url: '/dopples',
     icon: Bot,
   },
   {
