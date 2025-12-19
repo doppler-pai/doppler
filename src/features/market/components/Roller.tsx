@@ -68,7 +68,6 @@ export default function Roller({ rarity, skins, prices, onFinish }: RollerProps)
     }, 150);
   }, [skins]);
 
-
   function rollSkin(list: Skin[]): Skin {
     const rates = PACK_RATES[rarity];
     const roll = Math.random() * 100;
@@ -115,8 +114,6 @@ export default function Roller({ rarity, skins, prices, onFinish }: RollerProps)
       handleFinish(skin);
     }, 4600);
   }
-
-
 
   function buildStrip(target: Skin) {
     const STRIP = [];

@@ -1,6 +1,6 @@
 import { ref, update, get, child } from 'firebase/database';
 import { rtdb } from '@/shared/lib/firebase';
-import { QuizMetadata } from '@/shared/models/lobby.types';
+import { PlayerStats, QuizMetadata } from '@/shared/models/lobby.types';
 import { Question, QuestionType } from '@/shared/models/sets.type';
 
 function isAnswerCorrect(question: Question, answerIndex: number): boolean {
@@ -42,25 +42,47 @@ export async function showQuizResults(gameId: string, currentQuestion: Question)
     }
 
     const metadata = snapshot.val() as QuizMetadata;
-    const { points, answers } = metadata;
+    const { points, answers, stats } = metadata;
 
-    // Calculate new points based on answers
+    // Calculate new points and track stats
     const newPoints = { ...points };
+    const newPlayerStats: Record<string, PlayerStats> = { ...(stats?.playerStats ?? {}) };
+    let correctThisRound = 0;
+    let incorrectThisRound = 0;
+
     for (const [playerId, answerIndex] of Object.entries(answers)) {
+      // Initialize player stats if not exists
+      if (!newPlayerStats[playerId]) {
+        newPlayerStats[playerId] = { correct: 0, incorrect: 0 };
+      }
+
       if (isAnswerCorrect(currentQuestion, answerIndex)) {
         newPoints[playerId] = (newPoints[playerId] ?? 0) + 1;
+        newPlayerStats[playerId].correct++;
+        correctThisRound++;
+      } else {
+        newPlayerStats[playerId].incorrect++;
+        incorrectThisRound++;
       }
     }
 
+    const totalAnswersThisRound = Object.keys(answers).length;
+
     const correctAnswerIndices = getCorrectAnswerIndices(currentQuestion);
 
-    // Update metadata to show results
+    // Update metadata to show results with updated stats
     const updateRef = ref(rtdb, `lobbies/${gameId}/metadata`);
     await update(updateRef, {
       points: newPoints,
       showResults: true,
       correctAnswerIndices,
       resultsShownAt: Date.now(),
+      stats: {
+        totalCorrect: (stats?.totalCorrect ?? 0) + correctThisRound,
+        totalIncorrect: (stats?.totalIncorrect ?? 0) + incorrectThisRound,
+        totalAnswers: (stats?.totalAnswers ?? 0) + totalAnswersThisRound,
+        playerStats: newPlayerStats,
+      },
     });
 
     return { success: true };

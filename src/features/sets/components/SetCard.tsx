@@ -4,6 +4,7 @@ import { Pen, Trash2, Forward, Play } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface SetCardProps {
   id: string;
@@ -14,6 +15,7 @@ interface SetCardProps {
 }
 
 export const SetCard = ({ id, title, plays, edited, questions }: SetCardProps) => {
+  const router = useRouter();
   return (
     <div className="m-10 w-70 rounded-md" id="SetCard">
       <div className="relative">
@@ -36,7 +38,7 @@ export const SetCard = ({ id, title, plays, edited, questions }: SetCardProps) =
           <Button>
             <Play /> solo
           </Button>
-          <Button>
+          <Button onClick={() => router.push(`/sets/host/?setId=${id}`)}>
             <Play /> host
           </Button>
         </div>
