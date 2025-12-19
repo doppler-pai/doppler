@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { ProtectedRoute } from '@/shared/components/auth/ProtectedRoute';
@@ -10,6 +10,14 @@ import { PreHostForm } from '@/features/hostFlow/prehost/components/PreHostForm'
 type Status = 'checking' | 'not-found' | 'ok';
 
 export default function PreHostSetPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PreHostSetContent />
+    </Suspense>
+  );
+}
+
+function PreHostSetContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const setId = searchParams.get('setId');

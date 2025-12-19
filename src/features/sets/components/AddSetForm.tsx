@@ -13,6 +13,7 @@ interface SetFormProps {
   initialData?: SetData;
   onSubmit: (data: Omit<SetData, 'id'> | SetData) => Promise<void>;
   isLoading?: boolean;
+  readOnly?: boolean;
 }
 
 const DEFAULT_QUESTION: Question = {
@@ -28,7 +29,7 @@ const DEFAULT_QUESTION: Question = {
   },
 };
 
-export const SetForm = ({ initialData, onSubmit, isLoading }: SetFormProps) => {
+export const SetForm = ({ initialData, onSubmit, isLoading, readOnly = false }: SetFormProps) => {
   const [title, setTitle] = useState(initialData?.title || '');
   const [description, setDescription] = useState(initialData?.description || '');
   const [isPublic, setIsPublic] = useState(initialData?.isPublic || false);
@@ -115,37 +116,51 @@ export const SetForm = ({ initialData, onSubmit, isLoading }: SetFormProps) => {
           </div>
           <div className="w-[70%] flex flex-col justify-between">
             <div className="flex flex-col gap-1">
-              <Input
-                placeholder="Title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className={errors.title ? 'border-red-500' : ''}
-              />
-              {errors.title && <small className="text-red-500">{errors.title}</small>}
+              {readOnly ? (
+                <h1 className="text-2xl font-bold p-2">{title}</h1>
+              ) : (
+                <>
+                  <Input
+                    placeholder="Title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className={errors.title ? 'border-red-500' : ''}
+                  />
+                  {errors.title && <small className="text-red-500">{errors.title}</small>}
+                </>
+              )}
             </div>
 
             <div className="flex flex-col gap-1">
-              <Textarea
-                placeholder="Description"
-                className={`h-20 max-w-full ${errors.description ? 'border-red-500' : ''}`}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              />
-              {errors.description && <small className="text-red-500">{errors.description}</small>}
+              {readOnly ? (
+                <p className="p-2 text-muted-foreground whitespace-pre-wrap">{description}</p>
+              ) : (
+                <>
+                  <Textarea
+                    placeholder="Description"
+                    className={`h-20 max-w-full ${errors.description ? 'border-red-500' : ''}`}
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                  />
+                  {errors.description && <small className="text-red-500">{errors.description}</small>}
+                </>
+              )}
             </div>
           </div>
         </div>
         <div className="mt-5 flex justify-between">
           <div className="flex items-center space-x-2">
-            <Switch id="public-mode" checked={isPublic} onCheckedChange={setIsPublic} />
+            <Switch id="public-mode" checked={isPublic} onCheckedChange={setIsPublic} disabled={readOnly} />
             <label htmlFor="public-mode">{isPublic ? 'Public' : 'Private'}</label>
           </div>
-          <div className="flex flex-col items-end">
-            <Button onClick={handleSubmit} disabled={isLoading}>
-              {isLoading ? 'Saving...' : 'Save'}
-            </Button>
-            {errors.questions && <small className="text-red-500 mt-1">{errors.questions}</small>}
-          </div>
+          {!readOnly && (
+            <div className="flex flex-col items-end">
+              <Button onClick={handleSubmit} disabled={isLoading}>
+                {isLoading ? 'Saving...' : 'Save'}
+              </Button>
+              {errors.questions && <small className="text-red-500 mt-1">{errors.questions}</small>}
+            </div>
+          )}
         </div>
 
         <div className="mt-10 mb-20 flex flex-col gap-6">
@@ -159,6 +174,7 @@ export const SetForm = ({ initialData, onSubmit, isLoading }: SetFormProps) => {
               onAdd={() => handleAddQuestion(index)}
               onDelete={handleDeleteQuestion}
               onChange={(q) => handleQuestionChange(index, q)}
+              readOnly={readOnly}
             />
           ))}
         </div>

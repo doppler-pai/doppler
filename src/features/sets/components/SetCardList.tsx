@@ -5,6 +5,8 @@ import { SetCard } from './SetCard';
 import { fetchSets } from '../services/getUserSets';
 import { SetData } from '@/shared/models/sets.type';
 
+import { deleteSet } from '../services/deleteSet';
+
 interface SetCardListProps {
   userId: string;
 }
@@ -26,6 +28,16 @@ export const SetCardList = ({ userId }: SetCardListProps) => {
     loadSets();
   }, [userId]);
 
+  const handleDeleteSet = async (setId: string) => {
+    try {
+      await deleteSet(setId);
+      setSets((prevSets) => prevSets.filter((set) => set.id !== setId));
+    } catch (err) {
+      console.error('Failed to delete set:', err);
+      // Optionally handle error state here
+    }
+  };
+
   if (error) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -45,6 +57,7 @@ export const SetCardList = ({ userId }: SetCardListProps) => {
             plays={0}
             edited={5}
             questions={set.questions?.length || 0}
+            onDelete={() => handleDeleteSet(set.id)}
           />
         ))}
       </div>
