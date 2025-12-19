@@ -2,6 +2,7 @@
 
 import { Host } from './host/components/Host';
 import { HostGameRoot } from './hostGame/components/HostGameRoot';
+import { HostGameSummary } from './hostResults/components/HostGameSummary';
 import { useLobbyState } from '@/shared/hooks/useLobbyState';
 import { LobbyStatus } from '@/shared/models/lobby.types';
 
@@ -56,11 +57,7 @@ export function HostRoot({ gameId }: HostRootProps) {
   }
 
   if (status === LobbyStatus.COMPLETED) {
-    return (
-      <div className="flex min-h-[70vh] w-full items-center justify-center px-4">
-        <p>Lobby is completed.</p>
-      </div>
-    );
+    return <HostGameSummary gameId={gameId} />;
   }
 
   return (

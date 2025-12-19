@@ -5,9 +5,12 @@ import { LeaderboardEntry } from '@/shared/models/leaderboard.types';
 import { MiniLeaderboard } from './MiniLeaderboard';
 import { AnswerTile, AnswerColor } from './AnswerTile';
 
+export type AnswerState = 'default' | 'correct' | 'wrong' | 'dimmed';
+
 export type Answer = {
   text: string;
   onSelect: () => void;
+  state?: AnswerState;
 };
 
 type GameLayoutProps = {
@@ -17,6 +20,8 @@ type GameLayoutProps = {
   answers: Answer[];
   leaderboardEntries: LeaderboardEntry[];
   disabled?: boolean;
+  timeLeft?: number | null;
+  points?: number;
 };
 
 const answerColors: AnswerColor[] = ['orange', 'purple', 'green', 'blue'];
@@ -28,6 +33,8 @@ export function GameLayout({
   answers,
   leaderboardEntries,
   disabled = false,
+  timeLeft,
+  points,
 }: GameLayoutProps) {
   return (
     <div className="h-screen w-full flex flex-col bg-dark">
@@ -35,6 +42,12 @@ export function GameLayout({
 
       {/* Top half */}
       <div className="h-1/2 relative">
+        {/* Timer and Points - absolute top left */}
+        <div className="absolute top-4 left-4 flex flex-col gap-1">
+          {timeLeft != null && <p className="text-2xl font-bold">{timeLeft}s</p>}
+          {points != null && <p className="text-muted">Points: {points}</p>}
+        </div>
+
         {/* Question area - centered */}
         <div className="h-full flex flex-col items-center justify-center px-8">
           {/* Label */}
@@ -60,6 +73,7 @@ export function GameLayout({
               color={answerColors[index]}
               onClick={answer.onSelect}
               disabled={disabled}
+              state={answer.state}
             />
           ))}
         </div>

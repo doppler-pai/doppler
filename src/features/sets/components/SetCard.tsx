@@ -14,6 +14,7 @@ import {
   DialogTrigger,
 } from '@/shared/components/ui/dialog';
 import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface SetCardProps {
   id: string;
@@ -29,6 +30,7 @@ export const SetCard = ({ id, title, plays, edited, questions, onDelete }: SetCa
   const [copied, setCopied] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -139,7 +141,7 @@ export const SetCard = ({ id, title, plays, edited, questions, onDelete }: SetCa
           <Button>
             <Play /> solo
           </Button>
-          <Button>
+          <Button onClick={() => router.push(`/sets/host/?setId=${id}`)}>
             <Play /> host
           </Button>
         </div>

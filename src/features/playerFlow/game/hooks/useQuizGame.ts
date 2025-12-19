@@ -15,6 +15,9 @@ export type QuizGameState = {
   leaderboardEntries: LeaderboardEntry[];
   hasAnswered: boolean;
   selectedAnswer: number | null;
+  showResults: boolean;
+  correctAnswerIndices: number[];
+  currentUserPoints: number;
 };
 
 export function useQuizGame(gameId: string): QuizGameState {
@@ -68,6 +71,10 @@ export function useQuizGame(gameId: string): QuizGameState {
       }));
   }, [metadata, players]);
 
+  const showResults = metadata?.showResults ?? false;
+  const correctAnswerIndices = metadata?.correctAnswerIndices ?? [];
+  const currentUserPoints = currentUserId ? (metadata?.points?.[currentUserId] ?? 0) : 0;
+
   return {
     loading,
     currentQuestion,
@@ -77,5 +84,8 @@ export function useQuizGame(gameId: string): QuizGameState {
     leaderboardEntries,
     hasAnswered,
     selectedAnswer,
+    showResults,
+    correctAnswerIndices,
+    currentUserPoints,
   };
 }

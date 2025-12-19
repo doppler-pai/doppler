@@ -9,6 +9,7 @@ export type LobbyState = {
   isPlayer: boolean;
   status: LobbyStatus;
   gameType: GameModeType;
+  createdAt: number;
 };
 
 /**
@@ -58,6 +59,7 @@ export function useLobbyState(gameId: string): LobbyState | null {
           isPlayer,
           status: lobbyData.status,
           gameType: lobbyData.type,
+          createdAt: lobbyData.createdAt,
         });
       },
       (error) => {
