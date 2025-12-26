@@ -1,42 +1,38 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { SetCard } from './SetCard';
-import { fetchSets } from '../services/getUserSets';
+import { SetCard } from '@/features/sets/components/SetCard';
+import { fetchPublicSets } from '@/features/sets/services/getPublicSets';
 import { SetData } from '@/shared/models/sets.type';
+import { Loader2 } from 'lucide-react';
 
-import { deleteSet } from '../services/deleteSet';
-
-interface SetCardListProps {
-  userId: string;
-}
-
-export const SetCardList = ({ userId }: SetCardListProps) => {
+export default function ExplorePage() {
   const [sets, setSets] = useState<SetData[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadSets = async () => {
       try {
-        const setsData = await fetchSets(userId);
+        const setsData = await fetchPublicSets();
         setSets(setsData);
       } catch (err) {
         setError((err as Error).message);
+      } finally {
+        setLoading(false);
       }
     };
 
     loadSets();
-  }, [userId]);
+  }, []);
 
-  const handleDeleteSet = async (setId: string) => {
-    try {
-      await deleteSet(setId);
-      setSets((prevSets) => prevSets.filter((set) => set.id !== setId));
-    } catch (err) {
-      console.error('Failed to delete set:', err);
-      // Optionally handle error state here
-    }
-  };
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
 
   if (error) {
     return (
@@ -48,7 +44,7 @@ export const SetCardList = ({ userId }: SetCardListProps) => {
 
   return (
     <div className="container mx-auto p-4">
-      <h1>Your Sets</h1>
+      <h1>Public Sets</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {sets.map((set) => (
           <SetCard
@@ -56,19 +52,19 @@ export const SetCardList = ({ userId }: SetCardListProps) => {
             id={set.id}
             title={set.title}
             plays={0}
-            edited={5}
+            edited={0} // Placeholder as backend might not track this yet
             questions={set.questions?.length || 0}
-            onDelete={() => handleDeleteSet(set.id)}
+            // No onDelete for public explore page
           />
         ))}
       </div>
 
       {sets.length === 0 && (
         <div className="text-center text-gray-400 mt-20">
-          <h2>No quiz sets found</h2>
-          <p className="mt-2">Create your first set to get started!</p>
+          <h2>No public sets found</h2>
+          <p className="mt-2">Be the first to share a set!</p>
         </div>
       )}
     </div>
   );
-};
+}
