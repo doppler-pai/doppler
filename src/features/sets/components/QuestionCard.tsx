@@ -24,6 +24,8 @@ export function QuestionCard({
   onSelect,
   onAdd,
   onDelete,
+  onMoveUp,
+  onMoveDown,
   question,
   onChange,
   readOnly = false,
@@ -249,10 +251,24 @@ export function QuestionCard({
           >
             <Trash2 className="h-4 w-4" />
           </Button>
-          <Button variant="outline" size="icon" disabled>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={(e) => {
+              e.stopPropagation();
+              onMoveUp(String(index));
+            }}
+          >
             <ChevronUp className="h-4 w-4" />
           </Button>
-          <Button variant="outline" size="icon" disabled>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={(e) => {
+              e.stopPropagation();
+              onMoveDown(String(index));
+            }}
+          >
             <ChevronDown className="h-4 w-4" />
           </Button>
 
