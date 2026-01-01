@@ -63,6 +63,24 @@ export const SetForm = ({ initialData, onSubmit, isLoading, readOnly = false }: 
     }
   };
 
+  const handleMoveQuestion = (index: number, direction: 'up' | 'down') => {
+    if (direction === 'up' && index === 0) return;
+    if (direction === 'down' && index === questions.length - 1) return;
+
+    const newQuestions = [...questions];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+
+    [newQuestions[index], newQuestions[targetIndex]] = [newQuestions[targetIndex], newQuestions[index]];
+
+    setQuestions(newQuestions);
+
+    if (activeQuestionIndex === index) {
+      setActiveQuestionIndex(targetIndex);
+    } else if (activeQuestionIndex === targetIndex) {
+      setActiveQuestionIndex(index);
+    }
+  };
+
   const handleQuestionChange = (index: number, updatedQuestion: Question) => {
     const newQuestions = [...questions];
     newQuestions[index] = updatedQuestion;
@@ -173,6 +191,8 @@ export const SetForm = ({ initialData, onSubmit, isLoading, readOnly = false }: 
               onSelect={() => setActiveQuestionIndex(index)}
               onAdd={() => handleAddQuestion(index)}
               onDelete={handleDeleteQuestion}
+              onMoveUp={() => handleMoveQuestion(index, 'up')}
+              onMoveDown={() => handleMoveQuestion(index, 'down')}
               onChange={(q) => handleQuestionChange(index, q)}
               readOnly={readOnly}
             />
