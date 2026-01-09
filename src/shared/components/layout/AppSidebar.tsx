@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { Gamepad2, Bot, Store, List, PlusSquare, LogOut } from 'lucide-react';
+import { Gamepad2, Bot, Store, List, PlusSquare, LogOut, Compass } from 'lucide-react';
 
 import {
   Sidebar,
@@ -23,6 +23,11 @@ const links = [
     title: 'Play Now',
     url: '/play',
     icon: Gamepad2,
+  },
+  {
+    title: 'Explore',
+    url: '/sets/explore',
+    icon: Compass,
   },
   {
     title: 'Dopples',
