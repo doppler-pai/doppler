@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { auth, db } from '@/shared/lib/firebase';
@@ -9,7 +9,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { Rarity } from '@/shared/models/rarity';
 import { handleBuyService } from '../services/handleBuy';
 import { getSkinData } from '@/shared/services/getSkinData';
-import type { PackWithSkins, SkinWithOwnership } from '@/features/lobby/models/skin.types';
+import type { PackWithSkins, SkinWithOwnership } from '@/features/playerFlow/lobby/models/skin.types';
 
 import { Button } from '@/shared/components/ui/button';
 import { PackSection } from './PackSection';
@@ -45,7 +45,6 @@ export default function Market() {
         }
       });
 
-      // Fetch packs
       getSkinData(user.uid).then((result) => {
         if (result) {
           setPacks(result);
@@ -58,6 +57,16 @@ export default function Market() {
       if (unsubscribeSnapshot) unsubscribeSnapshot();
     };
   }, []);
+
+  const rarityPrices = useMemo(() => {
+    const prices: Record<string, number> = {};
+    packs.forEach((pack) => {
+      Object.entries(pack.rarities).forEach(([rarity, config]) => {
+        prices[rarity.toLowerCase()] = config.price;
+      });
+    });
+    return prices;
+  }, [packs]);
 
   const handleBuy = async (packId: string, rarity: Rarity, price: number) => {
     const user = auth.currentUser;
@@ -94,17 +103,14 @@ export default function Market() {
     const ref = doc(db, 'users', user.uid);
 
     if (isDuplicate) {
-      // Refund currency for duplicate
       await updateDoc(ref, {
         currency: increment(refund),
       });
     } else {
-      // Add skin to owned skins in Firestore
       await updateDoc(ref, {
         ownedSkinIds: arrayUnion(skin.id),
       });
 
-      // Update local state to mark skin as owned (for future rolls in same session)
       setPacks((prevPacks) =>
         prevPacks.map((pack) => ({
           ...pack,
@@ -123,17 +129,19 @@ export default function Market() {
   };
 
   return (
-    <div className="w-full">
-      <div className="w-full h-16 flex items-center px-12 justify-between">
-        <h1 className="mt-10 ml-12">Dopple Market</h1>
-        <div className="flex items-center gap-8 mt-10 mr-12">
-          <Button variant="outline" className="flex items-center gap-1">
+    <div className="min-h-screen w-full pb-20">
+      <div className="w-full max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between px-4 md:px-12 py-8 gap-6">
+        <h1 className="text-3xl md:text-4xl font-bold text-center md:text-left">Dopple Market</h1>
+        <div className="flex flex-wrap items-center justify-center gap-4">
+          <Button variant="outline" className="flex items-center gap-2 min-w-[100px]">
             {coins !== null ? coins : '...'}
             <Image src="/logo/logo.png" alt="coins" width={16} height={16} />
           </Button>
-          <Button variant="outline">Skins owned: {skinsCount !== null ? skinsCount : '...'}</Button>
-          <Link href="/mydopples">
-            <Button>My skin</Button>
+          <Button variant="outline" className="min-w-[120px]">
+            Owned: {skinsCount !== null ? skinsCount : '...'}
+          </Button>
+          <Link href="/dopples">
+            <Button>My Skins</Button>
           </Link>
         </div>
       </div>
@@ -148,8 +156,14 @@ export default function Market() {
         />
       ))}
 
-      {rollingRarity && (
-        <Roller key={rollKey} rarity={rollingRarity} skins={rollingSkins} onFinish={handleRollFinish} />
+      {rollingRarity && rollingSkins.length > 0 && (
+        <Roller
+          key={rollKey}
+          rarity={rollingRarity}
+          skins={rollingSkins.map((skin) => ({ ...skin, rarity: skin.rarity as Rarity }))}
+          prices={rarityPrices}
+          onFinish={handleRollFinish}
+        />
       )}
 
       {rollResult && (

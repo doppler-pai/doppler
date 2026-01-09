@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { Gamepad2, Bot, Store, List, PlusSquare } from 'lucide-react';
+import { Gamepad2, Bot, Store, List, PlusSquare, LogOut, Compass } from 'lucide-react';
 
 import {
   Sidebar,
@@ -21,17 +21,22 @@ import { useRouter } from 'next/navigation';
 const links = [
   {
     title: 'Play Now',
-    url: 'play',
+    url: '/play',
     icon: Gamepad2,
   },
   {
+    title: 'Explore',
+    url: '/sets/explore',
+    icon: Compass,
+  },
+  {
     title: 'Dopples',
-    url: '#',
+    url: '/dopples',
     icon: Bot,
   },
   {
     title: 'Dopple Market',
-    url: 'market',
+    url: '/market',
     icon: Store,
   },
   {
@@ -41,7 +46,7 @@ const links = [
   },
   {
     title: 'Create New Set',
-    url: '#',
+    url: 'sets/create',
     icon: PlusSquare,
   },
 ];
@@ -73,7 +78,7 @@ export function AppSidebar() {
           <SidebarMenu>
             {links.map((link) => (
               <SidebarMenuItem key={link.title}>
-                <SidebarMenuButton onClick={() => router.push(link.url)}>
+                <SidebarMenuButton onClick={() => router.replace(link.url)}>
                   <link.icon />
                   <span>{link.title}</span>
                 </SidebarMenuButton>
@@ -84,17 +89,23 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter>
         {user ? (
-          <div className="flex items-center justify-between gap-2 text-xs">
-            <div className="min-w-0 flex-1">
-              <p className="truncate font-medium">{user.email ?? 'Signed in'}</p>
+          open ? (
+            <div className="flex items-center justify-between gap-2 text-xs">
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-medium">{user.email ?? 'Signed in'}</p>
+              </div>
+              <Button size="sm" variant="ghost" onClick={handleLogout}>
+                Logout
+              </Button>
             </div>
-            <Button size="sm" variant="ghost" onClick={handleLogout}>
-              Logout
+          ) : (
+            <Button size="icon" variant="ghost" onClick={handleLogout} className="w-full" title="Logout">
+              <LogOut className="h-4 w-4" />
             </Button>
-          </div>
+          )
         ) : (
           <div className="flex items-center justify-between gap-2 text-xs">
-            <span className="text-muted-foreground">Not signed in</span>
+            <span className="text-muted-foreground">{open ? 'Not signed in' : '?'}</span>
           </div>
         )}
       </SidebarFooter>

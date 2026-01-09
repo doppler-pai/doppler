@@ -2,7 +2,7 @@
 
 import { useParams } from 'next/navigation';
 
-import { HostRoot } from '@/features/host/components/HostRoot';
+import { HostRoot } from '@/features/hostFlow/HostRoot';
 import { ProtectedRoute } from '@/shared/components/auth/ProtectedRoute';
 
 export default function HostLobbyPage() {

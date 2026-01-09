@@ -1,7 +1,7 @@
 import { Separator } from '@/shared/components/ui/separator';
 import { PackCard } from './PackCard';
 import { Rarity, RARITIES } from '@/shared/models/rarity';
-import type { RarityConfig } from '@/features/lobby/models/skin.types';
+import type { RarityConfig } from '@/features/playerFlow/lobby/models/skin.types';
 
 type PackSectionProps = {
   packName: string;
@@ -12,15 +12,13 @@ type PackSectionProps = {
 
 export function PackSection({ packName, packId, rarities, onBuy }: PackSectionProps) {
   return (
-    <div>
-      <div className="w-full h-24 mt-16 first:mt-4">
-        <div className="ml-24 w-[900px]">
-          <h2 className="ml-2 mb-2">{packName}</h2>
-          <Separator className="bg-white" />
-        </div>
+    <div className="w-full max-w-7xl mx-auto px-4 md:px-8 mb-16">
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold mb-4 ml-2">{packName}</h2>
+        <Separator className="bg-white/20" />
       </div>
 
-      <div className="ml-38 flex gap-36">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 justify-items-center">
         {RARITIES.map((rarity) => {
           const config = rarities[rarity];
           return (
