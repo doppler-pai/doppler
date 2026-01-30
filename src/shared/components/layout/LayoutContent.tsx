@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect, useRef, startTransition } from 'react';
 import { usePathname } from 'next/navigation';
 import { SidebarProvider } from '@/shared/components/ui/sidebar';
+import { AppSidebar } from '@/shared/components/layout/AppSidebar';
 
 export function LayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -28,6 +29,7 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
 
   return (
     <SidebarProvider open={open} onOpenChange={setOpen}>
+      {pathname !== '/' && <AppSidebar />}
       {children}
     </SidebarProvider>
   );
