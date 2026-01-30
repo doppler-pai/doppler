@@ -4,6 +4,7 @@ import { Lobby } from './lobby/components/Lobby';
 import { useLobbyState } from '@/shared/hooks/useLobbyState';
 import { LobbyStatus } from '@/shared/models/lobby.types';
 import { GameRoot } from './game/components/GameRoot';
+import { PlayerGameSummary } from './game/components/PlayerGameSummary';
 
 type Status = 'checking' | 'not-found' | LobbyStatus.QUEUED | LobbyStatus.IN_PROGRESS | LobbyStatus.COMPLETED;
 
@@ -41,11 +42,7 @@ export function PlayerRoot({ gameId }: PlayerRootProps) {
   }
 
   if (status === LobbyStatus.COMPLETED) {
-    return (
-      <div className="flex min-h-[70vh] w-full items-center justify-center px-4">
-        <p>Game has been completed.</p>
-      </div>
-    );
+    return <PlayerGameSummary gameId={gameId} />;
   }
   return (
     <div className="flex min-h-[70vh] w-full items-center justify-center px-4">
