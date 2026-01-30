@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import { Roboto } from 'next/font/google';
 import './globals.css';
-import { AppSidebar } from '@/shared/components/layout/AppSidebar';
-import { SidebarProvider } from '@/shared/components/ui/sidebar';
+
 import { AuthProvider } from '@/shared/context/AuthContext';
 import { LayoutContent } from '@/shared/components/layout/LayoutContent';
 
@@ -26,7 +25,6 @@ export default function RootLayout({
       <body className={`${roboto.variable} ${roboto.variable} text-text antialiased`}>
         <AuthProvider>
           <LayoutContent>
-            <AppSidebar />
             <main className="w-full">{children}</main>
           </LayoutContent>
         </AuthProvider>
